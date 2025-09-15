@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Link bootstrap resournces and style sheet in header -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SoundSculpt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="static/style/style.css">
+  </head>
+
+
+
+  <body>
+    <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
+    <nav id="navs" class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="static/img/logo.png" width="50" height="50">    
+                SoundSculpt</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="event_creation.html">Create Event</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Edit Event</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="bookings.html">Bookings</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Log In</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search"/>
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
+    <nav aria-label="breadcrumb">
+        <ol class="container breadcrumb mt-5 pt-5">
+            <li class="breadcrumb-item"><a href="index.html">Homepage</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Concert Details Page</li>
+        </ol>
+    </nav>
+
+        <!-- Shows all concert information previously inputted by the creator -->
+    <div class="container pt-5 pb-5">
+        <img class="card-img-top" src="static/img/gorillaz.jpg" alt="Gorillaz">
+    </div>
+    <div id="event_detail" class="container">
+        <span class="badge text-bg-secondary mb-2">Inactive</span>
+        <h1 class="p-5"><strong>Gorillaz World Tour 2022</strong></h1>
+
+        
+        <h5 id="special" class="p-2">By Gorillaz</h5>
+        <p>Gorillaz's 25th Anniversary tour pops off with a vibrant mix of live music, electronic innovation, and unique visual spectacle, featuring a visible band led by Damon Albarn, immersive animated visuals, and appearances by numerous guest collaborators</p>
+        <h3>Genre</h3>
+        <p>Rock, Hip-hop, Pop</p>
+        <h3>Date and Time</h3>
+        <p>Monday, 12th December 2022  8:00PM AEST</p>
+        <p>8:00PM - 11:00PM</p>
+         <!-- iframe allows for google maps to show the inputted location -->
+        <h3>Location</h3>
+        <p>Riverstage 59 Gardens Point Rd, Brisbane City QLD 4000</p>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3539.682124924899!2d153.02746611184372!3d-27.479153917011818!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b915a110598d1af%3A0xa18cc7aeb141039b!2sRiverstage!5e0!3m2!1sen!2sau!4v1756722379216!5m2!1sen!2sau"  height="450" style="border:0;" class="container rounded mx-auto d-block" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+        <h3>About</h3>
+        <strong id="special">The virtual band that can’t be constrained by boundaries</strong>
+        <p>Gorillaz was created by Blur frontman Damon Albarn and comic book artist Jamie Hewlett in 1998 as a way of breaking free from the lack of substance they saw in the music industry. Their animated band was designed to deliver fresh and different sounds, whilst also telling dark and twisted stories through music videos, online games, fictional radio programmes, and short stories. Ultimately, Gorillaz has encompassed a whole fictional universe and been named by Guinness World Records as the planet’s Most Successful Virtual Act. The band consists of four animated members: singer Stuart “2D” Pot, bassist Murdoc Niccals, guitarist Noodle and drummer Russel Hobbs.</p>
+        <p>Their eponymous debut album came out in 2001 featuring 'Clint Eastwood', for which Gorillaz received the 2001 MTV Europe Music Award for Best Song. Their 2005 follow-up, Demon Days, with the lead single 'Feel Good Inc' was also critically acclaimed and landed them a slew of awards – from the Danish Music Award for International Album to the Grammy for Best Pop Collaboration With Vocals.</p>
+        <p>Gorillaz released the albums Plastic Beach in 2010, The Fall in 2011, Humanz in 2017 and The Now Now in 2018 – all continuing their effortless fusion of styles and influences ranging from hip hop beats, Britpop and indie rock to electronic and orchestral sounds. Their songs also feature an array of vocals thanks to collaborations with a range of artists including Snoop Dogg, De La Soul, Lou Reed, Grace Jones, Bobby Womack, and Little Simz(Opens in new tab).</p>
+        <p>Along with groundbreaking music, stunning comic book visuals, 3D animation and live action footage, Gorillaz have become a global sensation over the years, touring the world and playing shows from San Diego to Damascus, Syria. Although Albarn is the main musical contributor, Remi Kabaka Jr became the producer and third permanent member of Gorillaz in 2016, after providing the voice of Hobbs for several years.</p>
+        <p>In early 2020, they unveiled the audiovisual series Song Machine, consisting of singles and music videos that came out monthly as episodes. This led to the release of their seventh album, Song Machine, Season One: Strange Timez, on 23 October 2020. The band celebrated the release of Song Machine, with a global live stream – three performances across three different time zones – direct from London in December of that year.</p>
+        <p>In 2025, Gorillaz announced House of Kong, an exhibition and four shows celebrating their 25th anniversary as a band. The exhibition and live shows will take place at the Copper Box Arena, London, with each live performance showcasing a different album.</p>
+    
+        <h3 id="tickets">Tickets</h3>
+    </div>
+
+    <!-- Allows for users to select and buy tickets.
+     It includes information on the tickets, an information button popover, and allows the user to select the amount of tickets they want,
+     0 is entered by default as to ensure users don't accidently purchase multiple tickets.
+     If all fields arent entered a warning message will pop up -->
+    <div class="container">
+        <div class="border p-5 m-4">
+
+            <div id="ticket_purchase" class="border row p-3 m-4">
+                <div class="col-md-2 mt-2">
+                    <strong>General Admission</strong>
+                    <p>$60 each</p>
+                </div>
+                <div class="col-md-4 mt-3 mb-3">
+                    <button  data-toggle="popover" class="btn btn-primary" title="Ticket Includes: One General Admission ticket">?</button>
+                </div>
+                <div class="col-md-2 offset-md-4 form-floating">
+                    <input type="summary" class="form-control" id="floatingInput" placeholder="" value="0">
+                    <label for="floatingInput">Quantity</label>
+                </div>
+            </div>
+
+            <div class="border row p-3 m-4">
+                <div class="col-md-2 mt-2">
+                    <strong>VIP Package</strong>
+                    <p>$120 each</p>
+                </div>
+                <div class="col-md-4 mt-3 mb-3">
+                    <button  data-toggle="popover" class="btn btn-primary" title="Ticket Includes: One General Admission ticket, One Anniversary Tour Gift">?</button>
+                </div>
+                <div class="col-md-2 offset-md-4 form-floating">
+                    <input type="summary" class="form-control" id="floatingInput" placeholder="" value="0">
+                    <label for="floatingInput">Quantity</label>
+                </div>
+            </div>
+
+            <div class="border row p-3 m-4">
+                <div class="col-md-2 mt-2">
+                    <strong>+VIP Package</strong>
+                    <p>$200 each</p>
+                </div>
+                <div class="col-md-4 mt-3 mb-3">
+                    <button  data-toggle="popover" class="btn btn-primary" title="Ticket Includes: One General Admission ticket, One Anniversary Tour Gift, One Backstage Pass">?</button>
+                </div>
+                <div class="col-md-2 offset-md-4 form-floating">
+                    <input type="summary" class="form-control" id="floatingInput" placeholder="" value="0">
+                    <label for="floatingInput">Quantity</label>
+                </div>
+            </div>
+            <!-- Once fully integrated, this button will lead the user to an additional purchase page to complete their transaction -->
+            <div id="get_tickets" class="d-grid gap-2">
+                <a href="#tickets" class="btn btn-primary p-2">Checkout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Displays comments left by previous users and allows for a logged in user to submit their own comment on the concert -->
+    <div id="event_detail" class="container">
+        <h3 id="comments">Comments</h3>
+        <div class="input-group input-group-lg mb-3">
+            <input type="text" class="form-control" placeholder="Leave a comment" aria-label="Leave a comment" aria-describedby="button-addon2">
+            <button class="btn btn-outline-primary" type="button" id="button-addon2">Submit</button>
+        </div>
+        <div class="border p-5 m-4">
+            <h6 id="special">by Pigeonade</h6>
+            <p>By far the best concert I’ve ever been to. The openers (Vince Staples and Danny Brown) were just as fantastic as Gorillaz themselves. (though they are apart of Gorillaz) But when Gorillaz got onstage, it absolutely blew my mind. Most of the instrumentation for their live shows is just that, LIVE. It’s an extremely impressive feat, and you’ll appreciate parts of their music you’ve never thought of. Best example of this is their back up singers, who, in my humble belief, went above and beyond. In the final few songs, you could have convinced me I was in the middle of a gospel song at church. Not to mention ALL their features, who have amazing singing talent in their own right.</p>
+        </div>
+        <div class="border p-5 m-4">
+            <h6 id="special">by John Smith</h6>
+            <p>Loved this concert!!!!</p>
+        </div>
+        <div class="border p-5 m-4">
+            <h6 id="special">#1GorillazHater</h6>
+            <p>Despite the undeniable talent and creativity on display, there were moments where the self-indulgence of the band bordered on the absurd. At times, it felt like the virtual members of Gorillaz were given more attention than the real-life musicians on stage, leaving some concertgoers feeling disconnected from the performance. Additionally, the elaborate visuals and stage effects occasionally overshadowed the music itself, leading to a spectacle that at times felt more style than substance.</p>
+        </div>
+        <button href="#comments" type="button" class="d-block mx-auto p-2 btn btn-link">View More Comments</button>
+    </div>
+
+    <!-- fixed to the bottom of the screen to allow users to easily make their way to purchasing tickets -->
+    <div id="get_tickets" class="d-grid gap-2">
+        <a href="#tickets" class="btn btn-primary fixed-bottom p-2">Get Tickets</a>
+    </div>
+
+    <!-- Allows for the popover effect to display -->
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
+
+  </body>
+  <footer>
+    <!-- The footer on all pages of the website that details important links across the website -->
+      <footer class="py-3 my-4 mb-5"> 
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3"> 
+          <li class="nav-item"><a href="index.html" class="nav-link px-2">Home</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">Features</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">Pricing</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">FAQs</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">About</a></li> 
+        </ul> 
+        <p class="text-center">© 2025 SoundSculpt, Inc</p> 
+      </footer> 
+	</footer>
+</html>
