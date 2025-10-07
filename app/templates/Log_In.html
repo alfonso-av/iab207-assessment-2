@@ -13,7 +13,7 @@
     <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
     <nav id="navs" class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="/">
                 <img src="static/img/logo.png" width="50" height="50">
                 SoundSculpt</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,16 +22,16 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="event_creation.html">Create Event</a>
+                <a class="nav-link active" aria-current="page" href="/create_event">Create Event</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Edit Event</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="bookings.html">Bookings</a>
+                <a class="nav-link" href="/bookings">Bookings</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Log In</a>
+                <a class="nav-link active" aria-current="page" href="/Register">Register</a>
                 </li>
             </ul>
             <form class="d-flex" role="search">
@@ -45,8 +45,8 @@
             <!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
         <nav aria-label="breadcrumb">
             <ol class="container breadcrumb mt-5 pt-5">
-                <li class="breadcrumb-item"><a href="index.html">Homepage</a></li>
-                <li class="breadcrumb-item active text-body" aria-current="page" >Register an account</li>
+                <li class="breadcrumb-item"><a href="/">Homepage</a></li>
+                <li class="breadcrumb-item active text-body" aria-current="page" >Log In</li>
             </ol>
         </nav>
 
@@ -54,66 +54,33 @@
     <!-- Allows a logged in user to create their own concert by detailing information about it -->
     <form id="form" class="container border border-3 p-5 rounded-5 needs-validation" novalidate>
         <div class="m-5">
-            <h1 id="title">Register Now</h1>
+            <h1 id="title">Log In</h1>
         </div>
-        <h5>First Name</h5>
+        <h5>Email Address</h5>
         <div class="form-floating mb-3">
-            <input type="name" class="form-control" id="floatingInput" placeholder="" required>
-            <label for="floatingInput">firstname</label>
+            <input type="name" class="form-control" id="floatingInput" placeholder="email" required>
+            <label for="floatingInput">email</label>
             <div class="invalid-feedback">
-                Please enter your First Name
-            </div>
-        </div>
-
-        <h5>Surname</h5>
-        <div class="form-floating mb-3">
-            <input type="name" class="form-control" id="floatingInput" placeholder="" required>
-            <label for="floatingInput">surname</label>
-            <div class="invalid-feedback">
-                Please enter your Surname
-            </div>
-        </div>
-        <h5>Email</h5>
-        <div class="form-floating mb-3">
-            <input type="summary" class="form-control" id="floatingInput" placeholder="" required>
-            <label for="floatingInput">email address</label>
-            <div class="invalid-feedback">
-                Please enter your Email
-            </div>
-        </div>
-        <h5>Contact Number</h5>
-        <div class="form-floating mb-3">
-            <input type="location" class="form-control" id="floatingInput" placeholder="" required>
-            <label for="floatingInput">phone number</label>
-            <div class="invalid-feedback">
-                Please enter your phone number
-            </div>
-        </div>
-        <h5>Street Address</h5>
-        <div class="form-floating mb-3">
-            <input class="form-control" placeholder="Description" id="floatingInput" required></input>
-            <label for="floatingInput">address</label>
-            <div class="invalid-feedback">
-                Please enter your street address
+                Please enter an email
             </div>
         </div>
         <h5>Password</h5>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="floatingInput" placeholder="" required>
-                <label for="floatingInput">password</label>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="floatingInput" placeholder="" required>
+            <label for="floatingInput">password</label>
             <div class="invalid-feedback">
                 Please enter your password
             </div>
-            </div>
+        </div>
         <div class="d-grid gap-2">
-        <button class="btn btn-success btn-lg m-4" type="submit">Register Account</button>
+            <button class="btn btn-success btn-lg m-4" type="submit">Log In</button>
         </div>
 
-        <pre>
-Have an account? <a href="Log_In.html">Log In</a> now!
-        </pre>
-    </form>
+            <pre>
+Don't have an account? <a href="/Register">Register</a> now!
+            </pre>
 
+    </form>
     <script>
     (() => {
     'use strict'
@@ -134,6 +101,7 @@ Have an account? <a href="Log_In.html">Log In</a> now!
     })
     })()
 </script>
+
 
   </body>
   <footer>
