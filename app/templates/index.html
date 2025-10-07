@@ -7,7 +7,7 @@
     <title>SoundSculpt</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="static/style/style.css">
+    <link rel="stylesheet" href="../static/style/style.css">
   </head>
 
 
@@ -16,8 +16,8 @@
     <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
     <nav id="navs" class="navbar navbar-expand-lg fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-          <img src="static/img/logo.png" width="50" height="50">
+        <a class="navbar-brand" href="/">
+          <img src="../static/img/logo.png" width="50" height="50">
           SoundSculpt
         </a>
 
@@ -27,13 +27,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="event_creation.html">Create Event</a>
+              <a class="nav-link active" aria-current="page" href="/create_event">Create Event</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Edit Event</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="bookings.html">Bookings</a>
+              <a class="nav-link" href="/bookings">Bookings</a>
             </li>
             <li class="nav-item dropdown ">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -73,21 +73,21 @@
       </div>
       <div id="carousel" class="carousel-inner rounded-5"  >
         <div class="carousel-item active">
-          <img src="static/img/concert 2.gif" class="d-block w-100" alt="...">
+          <img src="../static/img/concert 2.gif" class="d-block w-100" alt="...">
           <div class="carousel-caption">
             <h2>Discover</h2>
           <p>Find upcoming local bands</p>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="static/img/concert 1.gif" class="d-block w-100" alt="...">
+          <img src="../static/img/concert 1.gif" class="d-block w-100" alt="...">
           <div class="carousel-caption">
             <h2>Create</h2>
           <p>Host your own concert</p>
           </div>
        </div>
         <div class="carousel-item">
-          <img src="static/img/concert 3.gif" class="d-block w-100" alt="...">
+          <img src="../static/img/concert 3.gif" class="d-block w-100" alt="...">
           <div class="carousel-caption">
             <h2>Variety</h2>
           <p>Enjoy browsing different genres</p>
@@ -130,21 +130,21 @@
       <div id='card_image' class="row">
         <div class="col-lg-4 d-flex">
           <div  class="card m-3">
-            <img  src="static/img/clancy.jpg" class="card-img-top" alt="...">
+            <img  src="../static/img/clancy.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">The Clancy World Tour</h5>
               <span class="badge text-bg-success mb-2 p-2">Open</span>
               <p class="card-text">Brisbane, QLD  - 27th July 8:00pm </p>
               <p  class="card-text">The tour incorporates an elaborate, cinematic production with extensive visuals, pyrotechnics, and a powerful audio system designed to create a full-body, immersive experience for fans, to support the Breach album.</p>
               <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary align-self-end">Get Tickets</a>
+                <a href="/event_details" class="btn btn-primary align-self-end">Get Tickets</a>
               </div>
             </div>
           </div>
         </div>
         <div class="col-lg-4 d-flex">
           <div class="card m-3">
-            <img src="static/img/gorillaz.jpg" class="card-img-top" alt="...">
+            <img src="../static/img/gorillaz.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Gorillaz World Tour</h5>
 
@@ -152,21 +152,21 @@
               <p class="card-text">Gold Coast, QLD  - 12th December 9:00pm </p>
               <p class="card-text">Gorillaz's 25th Anniversary tour pops off with a vibrant mix of live music, electronic innovation, and unique visual spectacle, featuring a visible band led by Damon Albarn, immersive animated visuals, and appearances by numerous guest collaborators.</p>
               <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
+                <a href="/event_details" class="btn btn-primary">Get Tickets</a>
               </div>
             </div>
           </div>
         </div>
         <div class="col-lg-4 d-flex">
           <div class="card m-3">
-            <img src="static/img/Hozier.jpg" class="card-img-top" alt="...">
+            <img src="../static/img/Hozier.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Hozier Unreal Unearth Tour </h5>
               <span class="badge text-bg-success mb-2 p-2">Open</span>
               <p class="card-text">Sydney, QLD  - 11th March 7:30pm </p>
               <p class="card-text">featuring a visually rich production with projections and lighting, and a setlist that drew heavily from the new album, <em>Unreal Unearth</em>, alongside fan favorites. </p>
               <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
+                <a href="/event_details" class="btn btn-primary">Get Tickets</a>
               </div>
               </div>
             </div>
