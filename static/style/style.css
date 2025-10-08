@@ -132,9 +132,3 @@ form h5 {
 display: flex;
 flex-direction: column;
 }
-
-pre {
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  text-align: center;
-
-}
