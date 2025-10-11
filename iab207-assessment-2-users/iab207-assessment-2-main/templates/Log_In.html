@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Link bootstrap resournces and style sheet in header -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SoundSculpt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="static/style/style.css">
+  </head>
+  <body id="event_creation_body">
+    <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
+    <nav id="navs" class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="static/img/logo.png" width="50" height="50">
+                SoundSculpt</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ url_for('events.create') }}">Create Event</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Edit Event</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="/bookings">Bookings</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/register">Register</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search"/>
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </form>
+            </div>
+        </div>
+        </nav>
+
+            <!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
+        <nav aria-label="breadcrumb">
+            <ol class="container breadcrumb mt-5 pt-5">
+                <li class="breadcrumb-item"><a href="/">Homepage</a></li>
+                <li class="breadcrumb-item active text-body" aria-current="page" >Log In</li>
+            </ol>
+        </nav>
+
+
+    <!-- Allows a logged in user to create their own concert by detailing information about it -->
+    <form id="form" class="container border border-3 p-5 rounded-5 needs-validation" novalidate method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">
+                      {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        <div class="m-5">
+            <h1 id="title">Log In</h1>
+        </div>
+        <h5>Email Address</h5>
+        <div class="form-floating mb-3">
+                {{ form.email(type="email", class="form-control", id="floatingInput", placeholder="") }}
+            <label for="floatingInput">email</label>
+            <div class="invalid-feedback">
+                Please enter a valid email
+            </div>
+        </div>
+        <h5>Password</h5>
+        <div class="form-floating mb-3">
+                {{ form.password(type="password", class="form-control", id="floatingInput", placeholder="") }}
+            <label for="floatingInput">password</label>
+            <div class="invalid-feedback">
+                Please enter your password
+            </div>
+        </div>
+        <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-success btn-lg", id="toastbtn") }}
+        </div>
+
+            <pre>
+Don't have an account? <a href="/register">Register</a> now!
+            </pre>
+
+    </form>
+    <script>
+    (() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+        }, false)
+    })
+    })()
+</script>
+
+
+  </body>
+  <footer>
+    <!-- The footer on all pages of the website that details important links across the website -->
+      <footer class="py-3 my-4"> 
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3"> 
+          <li class="nav-item"><a href="/" class="nav-link px-2">Home</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">Features</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">Pricing</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">FAQs</a></li> 
+          <li class="nav-item"><a href="#" class="nav-link px-2">About</a></li> 
+        </ul> 
+        <p class="text-center" id="footer_text">© 2025 SoundSculpt, Inc</p> 
+      </footer> 
+	</footer>
+  
+</html>
