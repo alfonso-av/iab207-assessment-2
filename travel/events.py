@@ -4,6 +4,7 @@ import os
 import time
 from .models import db, Event, Ticket, Comment
 from .forms import EventForm, TicketForm, CommentForm
+from flask_login import login_required
 
 # Use of blueprint to group routes, 
 # name - first argument is the blue print name 
@@ -18,6 +19,7 @@ def show(id):
     return render_template('event_details.html', event=event, comment_form=comment_form)
 
 @eventbp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     """Create a new event"""
     form = EventForm()
@@ -66,7 +68,7 @@ def create():
                 end_time=form.end_time.data,
                 status=form.status.data
             )
-            
+             
             db.session.add(event)
             db.session.flush()  # Get the event ID
             
@@ -128,6 +130,7 @@ def add_ticket(event_id):
     return redirect(url_for('events.show', id=event_id))
 
 @eventbp.route('/<int:event_id>/add_comment', methods=['POST'])
+@login_required
 def add_comment(event_id):
     """Add a comment to an event"""
     event = Event.query.get_or_404(event_id)
@@ -186,3 +189,4 @@ def get_destination():
     comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
     destination.set_comments(comment)
     return destination
+

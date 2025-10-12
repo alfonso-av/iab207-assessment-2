@@ -33,10 +33,14 @@
                     <a class="nav-link" href="#">Edit Event</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="bookings.html">Bookings</a>
+                <a class="nav-link" href="/bookings">Bookings</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Log In</a>
+                {% if current_user.is_authenticated %}
+                <a class="nav-link active" aria-current="page" href="{{ url_for('auth.logout') }}">Log Out</a>
+                {% else %}
+                <a class="nav-link active" aria-current="page" href="/login">Log In</a>
+                {% endif %}
                 </li>
             </ul>
             <form class="d-flex" role="search">

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField
-from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError
+from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField, PasswordField
+from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError, Email, EqualTo
 from wtforms.widgets import CheckboxInput, ListWidget
 
 class MultiCheckboxField(SelectMultipleField):
@@ -67,3 +67,25 @@ class DestinationForm(FlaskForm):
     image = StringField('Cover Image', validators=[InputRequired()])
     currency = StringField('Currency', validators=[InputRequired()])
     submit = SubmitField("Create")
+
+class LoginForm(FlaskForm):
+  email = StringField('Email', validators=[InputRequired()])
+  password = PasswordField('Password', validators=[InputRequired()])
+  submit = SubmitField('Login')
+
+
+class RegisterForm(FlaskForm):
+    first_name = StringField('First Name', validators=[InputRequired()])
+    surname = StringField('Surname', validators=[InputRequired()])
+    email = StringField('Email ID', validators=[InputRequired() ])
+    phone = StringField('Contact Number', validators=[InputRequired()])
+    address = StringField('Street Address', validators=[InputRequired()])
+    #password field
+    password = StringField('Password', validators=[InputRequired()])
+  #validator to check if the user entry is equal to password
+   # confirm = PasswordField('Confirm Password', 
+    #      validators=[EqualTo('password', message='Re-enter same as Password')])
+ 
+    submit = SubmitField('Register now')
+
+
