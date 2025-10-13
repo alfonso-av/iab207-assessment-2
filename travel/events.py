@@ -11,6 +11,13 @@ from flask_login import login_required
 # import name - second argument - helps identify the root url for it 
 eventbp = Blueprint('events', __name__, url_prefix='/events')
 
+@eventbp.route('/')
+def list_all():
+    """Display all events"""
+    events = Event.query.order_by(Event.event_date.asc()).all()
+    return render_template('all_events.html', events=events)
+
+
 @eventbp.route('/<int:id>')
 def show(id):
     """Show event details"""
@@ -189,4 +196,6 @@ def get_destination():
     comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
     destination.set_comments(comment)
     return destination
+
+
 
