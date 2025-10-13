@@ -1,5 +1,21 @@
 from datetime import datetime
+from flask_login import UserMixin
 from . import db
+
+class User(db.Model, UserMixin):
+    __tablename__='users'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    surname = db.Column(db.String(100), nullable=False)
+    emailid = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)#should be 128 in length to store hash
+
+    def __repr__(self):
+        return "<Email: {}, id: {}>".format(self.emailid, self.id)
+    
+
 
 class Event(db.Model):
     __tablename__ = 'events'

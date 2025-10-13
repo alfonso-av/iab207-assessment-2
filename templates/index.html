@@ -1,68 +1,7 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Link bootstrap resournces and style sheet in header -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SoundSculpt</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="static/style/style.css">
-  </head>
+{% extends 'base.html' %}
 
-
-
+{% block content %}
   <body id="homepage">
-    <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
-    <nav id="navs" class="navbar navbar-expand-lg fixed-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-          <img src="static/img/logo.png" width="50" height="50">
-          SoundSculpt
-        </a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="event_creation.html">Create Event</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Edit Event</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="bookings.html">Bookings</a>
-            </li>
-            <li class="nav-item dropdown ">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Genres
-              </a>
-                <!-- The home page features a genre tab as to gain quick access to these options-->
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Pop</a></li>
-                <li><a class="dropdown-item" href="#">Punk</a></li>
-                <li><a class="dropdown-item" href="#">Rock</a></li>
-                <li><a class="dropdown-item" href="#">Jazz</a></li>
-                <li><a class="dropdown-item" href="#">Metal</a></li>
-                <li><a class="dropdown-item" href="#">Hip-Hop</a></li>
-                <li><a class="dropdown-item" href="#">Country</a></li>
-                <li><a class="dropdown-item" href="#">Electronic</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Log In</a>
-            </li>
-          </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search"/>
-            <button class="btn btn-outline-secondary" type="submit">Search</button>
-          </form>
-        </div>
-      </div>
-    </nav>
-
     <!-- Adds carousel to the page and gives a brief first view of what the website is intended to do as well as being aesthetically pleasing -->
 
     <div id="carouselExampleIndicators" class="container carousel slide" >
@@ -202,21 +141,5 @@
 
     </div>
 
-
-  </body>
-  <footer>
-  <!-- The footer on all pages of the website that details important links across the website -->
-
-      <footer class="py-3 my-4"> 
-        <ul class="nav justify-content-center border-bottom pb-3 mb-3"> 
-          <li class="nav-item"><a href="#" class="nav-link px-2">Home</a></li> 
-          <li class="nav-item"><a href="#" class="nav-link px-2">Features</a></li> 
-          <li class="nav-item"><a href="#" class="nav-link px-2">Pricing</a></li> 
-          <li class="nav-item"><a href="#" class="nav-link px-2">FAQs</a></li> 
-          <li class="nav-item"><a href="#" class="nav-link px-2">About</a></li> 
-        </ul> 
-        <p class="text-center">© 2025 SoundSculpt, Inc</p> 
-      </footer> 
-
-	</footer>
-</html>
+ 
+{% endblock %}

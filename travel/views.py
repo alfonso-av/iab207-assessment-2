@@ -10,7 +10,11 @@ project (folder)
 '''
 travel/views.py
 '''
-from flask import Blueprint, render_template
+from flask import Blueprint,render_template, redirect, url_for, request, flash
+from .forms import RegisterForm
+from . import db
+from .models import User
+from flask_login import login_required, current_user
 
 # Use of blue print to group routes, 
 # name - first argument is the blue print name 
@@ -23,6 +27,20 @@ def index():
     # Show events that are Open or Sold Out (not Cancelled or Inactive)
     events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.desc()).limit(6).all()
     return render_template('index.html', events=events)
+
+@mainbp.route("/bookings")
+def bookings():
+    return render_template("bookings.html")
+
+@mainbp.route("/about")
+def about():
+    return render_template("about.html")
+
+@mainbp.route("/faq")
+def faq():
+    return render_template("FAQ.html")
+
+
 
 
 
