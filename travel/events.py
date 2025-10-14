@@ -4,12 +4,19 @@ import os
 import time
 from .models import db, Event, Ticket, Comment
 from .forms import EventForm, TicketForm, CommentForm
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 # Use of blueprint to group routes, 
 # name - first argument is the blue print name 
 # import name - second argument - helps identify the root url for it 
 eventbp = Blueprint('events', __name__, url_prefix='/events')
+
+@eventbp.route('/')
+def list_all():
+    """Display all events"""
+    events = Event.query.order_by(Event.event_date.asc()).all()
+    return render_template('all_events.html', events=events)
+
 
 @eventbp.route('/<int:id>')
 def show(id):
@@ -66,7 +73,8 @@ def create():
                 event_date=form.event_date.data,
                 start_time=form.start_time.data,
                 end_time=form.end_time.data,
-                status=form.status.data
+                status=form.status.data,
+                user_id=current_user.id # attach user_id with whoever is currently logged in
             )
              
             db.session.add(event)
@@ -189,4 +197,6 @@ def get_destination():
     comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
     destination.set_comments(comment)
     return destination
+
+
 
