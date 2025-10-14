@@ -5,6 +5,7 @@ import time
 from .models import db, Event, Ticket, Comment
 from .forms import EventForm, TicketForm, CommentForm
 from flask_login import login_required, current_user
+from sqlalchemy import or_
 
 # Use of blueprint to group routes, 
 # name - first argument is the blue print name 
@@ -16,6 +17,23 @@ def list_all():
     """Display all events"""
     events = Event.query.order_by(Event.event_date.asc()).all()
     return render_template('all_events.html', events=events)
+
+@eventbp.route('/search')
+def search():
+    query = request.args.get('q', '').strip()  # what user typed
+    if not query:
+        events = Event.query.all()
+    else:
+        events = Event.query.filter(
+            or_(
+                Event.name.ilike(f"%{query}%"),
+                Event.artist.ilike(f"%{query}%"),
+                Event.genres.ilike(f"%{query}%"),
+                Event.location.ilike(f"%{query}%"),
+            )
+        ).all()
+
+    return render_template('all_events.html', events=events, query=query)
 
 
 @eventbp.route('/<int:id>')

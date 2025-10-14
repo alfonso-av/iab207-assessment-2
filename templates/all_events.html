@@ -2,8 +2,20 @@
 {% block title %}All Events{% endblock %}
 
 {% block content %}
-<div id="homepage" class="p-0">
-  <div class="container-fluid mt-5 px-5">  
+<div id="homepage">
+  <div class="container-fluid mt-5 px-5"> 
+    {% if query %}
+      {% if events %}
+        <h5 class="text-center text-light mb-4">
+          Showing ({{ events|length }}) {{ 'result' if events|length == 1 else 'results' }} matching “{{ query }}”:
+        </h5>
+      {% else %}
+        <h5 class="text-center text-light mb-4">
+          No results found for "{{ query }}"
+        </h5>
+      {% endif %}
+    {% endif %}
+     
     <h1 class="text-center mb-4">All Events</h1>
 
     <div id="card_image" class="row justify-content-center">
