@@ -33,7 +33,11 @@ class Event(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='Open', nullable=False)  # Open, Sold Out, Cancelled, Inactive
+
     
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    user = db.relationship('User', backref='events')
+
     # Relationship with tickets
     tickets = db.relationship('Ticket', backref='event', lazy=True, cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='event', lazy=True, cascade='all, delete-orphan')

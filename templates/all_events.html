@@ -3,7 +3,6 @@
 
 {% block content %}
 <div id="homepage" class="p-0">
-  <!-- use container-fluid for full width and add horizontal padding for breathing room -->
   <div class="container-fluid mt-5 px-5">  
     <h1 class="text-center mb-4">All Events</h1>
 
@@ -41,6 +40,29 @@
                 {{ event.overview or event.description[:200] }}
                 {% if event.description and event.description|length > 200 %}...{% endif %}
               </p>
+
+              <!-- 🆕 Added event metadata -->
+              <hr class="my-2">
+              <p class="card-text text-muted mb-1">
+                Published by: 
+                {% if event.user %}
+                  {{ event.user.first_name }} {{ event.user.surname }}
+                {% else %}
+                  Unknown
+                {% endif %}
+              </p>
+              <p class="text-muted mb-1" style="font-size: 0.9rem;">
+                <strong>Genre:</strong>
+                {% if event.genres %}
+                  {{ event.genres }}
+                {% else %}
+                  Not specified
+                {% endif %}
+              </p>
+              <p class="text-muted mb-3" style="font-size: 0.9rem;">
+                <strong>Tickets available:</strong> 500
+              </p>
+              <!-- end metadata -->
 
               <div class="d-grid gap-2 mt-auto">
                 <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-primary align-self-end">Get Tickets</a>
