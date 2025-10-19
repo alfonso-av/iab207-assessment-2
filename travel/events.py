@@ -18,6 +18,48 @@ def list_all():
     events = Event.query.order_by(Event.event_date.asc()).all()
     return render_template('all_events.html', events=events)
 
+@eventbp.route('/all', methods=['GET'])
+def all_events():
+    query = request.args.get('query', '')
+    sort_date = request.args.get('sort_date')
+    sort_alpha = request.args.get('sort_alpha')
+    category = request.args.get('category')
+    status = request.args.get('status')
+    
+
+    events = Event.query
+
+    # search query
+    if query:
+        events = events.filter(Event.name.ilike(f"%{query}%"))
+
+    # genre filter
+    if category:
+        events = events.filter(Event.genres.ilike(f"%{category}%"))
+
+    # Status filter
+    if status:
+        events = events.filter(Event.status.ilike(f"%{status}%"))
+
+    # sorting options
+    if sort_date == "newest":
+        events = events.order_by(Event.event_date.desc())
+    elif sort_date == "oldest":
+        events = events.order_by(Event.event_date.asc())
+    elif sort_alpha == "az":
+        events = events.order_by(Event.name.asc())
+    elif sort_alpha == "za":
+        events = events.order_by(Event.name.desc())
+
+    events = events.all()
+
+    # automatically update event statuses based on current time and conditions
+    for event in events:
+        event.update_status()
+
+    return render_template('all_events.html', events=events, query=query)
+
+
 @eventbp.route('/search')
 def search():
     query = request.args.get('q', '').strip()  # what user typed
