@@ -2,73 +2,169 @@
 {% block title %}All Events{% endblock %}
 
 {% block content %}
-<div id="homepage" class="p-0">
-  <div class="container-fluid mt-5 px-5">  
+<div id="homepage">
+  <div class="container-fluid mt-5 px-5"> 
+
     <h1 class="text-center mb-4">All Events</h1>
+
+    <!-- Display the total number of results found -->
+    {% if events %}
+      <h5 class="text-center text-light mb-4">
+        Found ({{ events|length }}) {{ 'result' if events|length == 1 else 'results' }}
+        {% if query %}
+          matching “{{ query }}”
+        {% elif request.args.get('status') %}
+          with status “{{ request.args.get('status') }}”
+        {% elif request.args.get('category') %}
+          in category “{{ request.args.get('category') }}”
+        {% endif %}
+      </h5>
+    {% else %}
+      <h5 class="text-center text-light mb-4">
+        No events found
+        {% if query %}
+          matching “{{ query }}”
+        {% endif %}
+      </h5>
+    {% endif %}
+    <!-- end results summary -->
+
+    <!-- Filter section (date, genre, status) -->
+    <form method="GET" action="{{ url_for('events.all_events') }}" 
+          class="row mb-5 justify-content-center align-items-end g-3 text-light">
+
+      <!-- Date filter -->
+      <div class="col-md-2">
+        <label for="sort_date" class="form-label mb-1">Date</label>
+        <select class="form-select" id="sort_date" name="sort_date">
+          <option value="">--</option>
+          <option value="newest" {% if request.args.get('sort_date') == 'newest' %}selected{% endif %}>Newest → Oldest</option>
+          <option value="oldest" {% if request.args.get('sort_date') == 'oldest' %}selected{% endif %}>Oldest → Newest</option>
+        </select>
+      </div>
+
+      <!-- Genre filter -->
+      <div class="col-md-3">
+        <label for="category" class="form-label mb-1">Genre</label>
+        <select class="form-select" id="category" name="category">
+          <option value="">--</option>
+          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic'] %}
+          {% for genre in genres %}
+            <option value="{{ genre }}" {% if request.args.get('category') == genre %}selected{% endif %}>{{ genre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status filter -->
+      <div class="col-md-2">
+        <label for="status" class="form-label mb-1">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="">Show All</option>
+          {% set statuses = ['Open', 'Inactive', 'Cancelled', 'Sold Out'] %}
+          {% for s in statuses %}
+            <option value="{{ s }}" {% if request.args.get('status', 'Open') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filter button -->
+      <div class="col-md-2 text-center">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+      </div>
+    </form>
+    <!-- End filter section -->
 
     <div id="card_image" class="row justify-content-center">
       {% if events %}
         {% for event in events %}
         <div class="col-lg-4 d-flex">
-          <div class="card m-3 w-100">
-            {% if event.image %}
-              <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
-            {% else %}
-              <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
-            {% endif %}
-
-            <div class="card-body">
-              <h5 class="card-title">{{ event.name }}</h5>
-
-              {% if event.status and event.status|lower == 'open' %}
-                <span class="badge text-bg-success mb-2 p-2">Open</span>
+          <!-- Whole card links to event details -->
+          <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
+            <div class="card m-3 w-100 clickable-card shadow-sm">
+              {% if event.image %}
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
               {% else %}
-                <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
               {% endif %}
 
-              <p class="card-text">
-                {{ event.location }} -
-                {% if event.event_date %}
-                  {{ event.event_date.strftime('%d %B') }}
-                {% endif %}
-                {% if event.start_time %}
-                  {{ event.start_time.strftime('%I:%M%p')|lower }}
-                {% endif %}
-              </p>
+              <div class="card-body">
+                <h5 class="card-title">{{ event.name }}</h5>
 
-              <p class="card-text">
-                {{ event.overview or event.description[:200] }}
-                {% if event.description and event.description|length > 200 %}...{% endif %}
-              </p>
-
-              <!-- 🆕 Added event metadata -->
-              <hr class="my-2">
-              <p class="card-text text-muted mb-1">
-                Published by: 
-                {% if event.user %}
-                  {{ event.user.first_name }} {{ event.user.surname }}
-                {% else %}
-                  Unknown
+                <!-- Status badge (Open, Sold Out, etc.) -->
+                {% if event.dynamic_status %}
+                  {% set status = event.status.lower() %}
+                  {% if status == 'open' %}
+                    <span class="badge text-bg-success mb-2 p-2">Open</span>
+                  {% elif status == 'sold out' %}
+                    <span class="badge text-bg-danger mb-2 p-2">Sold Out</span>
+                  {% elif status == 'cancelled' %}
+                    <span class="badge text-bg-warning mb-2 p-2">Cancelled</span>
+                  {% elif status == 'inactive' %}
+                    <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary mb-2 p-2">{{ event.dynamic_status }}</span>
+                  {% endif %}
                 {% endif %}
-              </p>
-              <p class="text-muted mb-1" style="font-size: 0.9rem;">
-                <strong>Genre:</strong>
-                {% if event.genres %}
-                  {{ event.genres }}
-                {% else %}
-                  Not specified
-                {% endif %}
-              </p>
-              <p class="text-muted mb-3" style="font-size: 0.9rem;">
-                <strong>Tickets available:</strong> 500
-              </p>
-              <!-- end metadata -->
 
-              <div class="d-grid gap-2 mt-auto">
-                <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-primary align-self-end">Get Tickets</a>
+                <!-- Basic info (location, date, time) -->
+                <p class="card-text mb-1">
+                  <strong>Location:</strong> {{ event.location }}
+                </p>
+                <p class="card-text mb-1">
+                  <strong>Date:</strong>
+                  {% if event.event_date %}
+                    {{ event.event_date.strftime('%d %B %Y') }}
+                  {% endif %}
+                </p>
+                <p class="card-text mb-2">
+                  <strong>Time:</strong>
+                  {% if event.start_time %}
+                    {{ event.start_time.strftime('%I:%M %p')|lower }}
+                  {% endif %}
+                  –
+                  {% if event.end_time %}
+                    {{ event.end_time.strftime('%I:%M %p')|lower }}
+                  {% endif %}
+                </p>
+
+                <!-- Shortened description -->
+                <p class="card-text mt-3" style="min-height: 90px;">
+                  <strong>Description:</strong><br>
+                  {% set desc = event.overview or event.description %}
+                  {% if desc %}
+                    {{ desc[:100] }}{% if desc|length > 100 %}...{% endif %}
+                  {% else %}
+                    No description available.
+                  {% endif %}
+                </p>
+
+                <hr class="my-2">
+
+                <!-- Extra details (author, genre, tickets) -->
+                <p class="card-text text-muted mb-1">
+                  <strong>Published by:</strong> 
+                  {% if event.user %}
+                    {{ event.user.first_name }} {{ event.user.surname }}
+                  {% else %}
+                    Unknown
+                  {% endif %}
+                </p>
+                <p class="text-muted mb-1" style="font-size: 0.9rem;">
+                  <strong>Genre:</strong> {{ event.genres or 'Not specified' }}
+                </p>
+                <p class="text-muted mb-3" style="font-size: 0.9rem;">
+                  <strong>Tickets:</strong>
+                  500 available 
+                  {% if event.tickets and event.tickets|length > 0 %}
+                    – from ${{ "%.2f"|format(event.tickets[0].price) }}
+                  {% else %}
+                    – price not listed
+                  {% endif %}
+                </p>
+
               </div>
             </div>
-          </div>
+          </a>
         </div>
         {% endfor %}
       {% else %}

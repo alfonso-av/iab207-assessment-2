@@ -26,7 +26,7 @@ class Event(db.Model):
     overview = db.Column(db.Text, nullable=False)
     location = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    genres = db.Column(db.String(200), nullable=False)  # Store as comma-separated string
+    genres = db.Column(db.String(200), nullable=False)
     image = db.Column(db.String(200), nullable=True)
     event_date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
@@ -34,16 +34,51 @@ class Event(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='Open', nullable=False)  # Open, Sold Out, Cancelled, Inactive
 
-    
+    # Foreign key relationship
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user = db.relationship('User', backref='events')
 
-    # Relationship with tickets
+    # Related models
     tickets = db.relationship('Ticket', backref='event', lazy=True, cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='event', lazy=True, cascade='all, delete-orphan')
-    
+
     def __repr__(self):
-        return f"Event: {self.name} by {self.artist}"
+        return f"<Event {self.name} by {self.artist}>"
+
+    # 🔄 Determine the *correct* current status based on real-time conditions
+    def get_dynamic_status(self):
+        now = datetime.now()
+
+        # Cancelled always takes highest priority
+        if self.status and self.status.lower() == "cancelled":
+            return "Cancelled"
+
+        # Sold Out next priority
+        if self.status and self.status.lower() == "sold out":
+            return "Sold Out"
+
+        # Check if event has ended
+        if self.event_date and self.end_time:
+            event_end = datetime.combine(self.event_date, self.end_time)
+            if event_end < now:
+                return "Inactive"
+
+        # Otherwise, still open
+        return "Open"
+
+    # 🧠 Persist a corrected status in the DB if out of sync
+    def update_status(self):
+        """Compare current and computed status; sync DB if needed."""
+        new_status = self.get_dynamic_status()
+        if new_status != self.status:
+            self.status = new_status
+            db.session.commit()
+
+    # 📊 Shortcut property — access in templates via {{ event.dynamic_status }}
+    @property
+    def dynamic_status(self):
+        """Return up-to-date event status based on time, tickets, and cancellation."""
+        return self.get_dynamic_status()
 
 class Ticket(db.Model):
     __tablename__ = 'tickets'
