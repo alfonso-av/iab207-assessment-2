@@ -202,6 +202,12 @@ def create():
             db.session.commit()
             
             flash(f'Event "{event.name}" created successfully!.', 'success')
+            tickets_added_count += 1
+         
+
+            db.session.commit()
+            
+            flash(f'Event "{event.name}" created successfully! {tickets_added_count} ticket type(s) added.', 'success')
             return redirect(url_for('events.show', id=event.id))
             
         except Exception as e:
