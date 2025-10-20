@@ -28,9 +28,10 @@ def index():
     events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.desc()).limit(6).all()
     return render_template('index.html', events=events)
 
-@mainbp.route("/bookings")
-def bookings():
-    return render_template("bookings.html")
+# REMOVED: The placeholder route for /bookings has been removed.
+# @mainbp.route("/bookings")
+# def bookings():
+#     return render_template("bookings.html")
 
 @mainbp.route("/about")
 def about():
@@ -39,11 +40,3 @@ def about():
 @mainbp.route("/faq")
 def faq():
     return render_template("FAQ.html")
-
-
-
-
-
-
-
-

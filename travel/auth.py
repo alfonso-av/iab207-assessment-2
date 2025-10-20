@@ -15,6 +15,7 @@ authbp = Blueprint('auth',__name__)
 def register():  
   #create the form
     form = RegisterForm()
+    
 
 
     #this line is called when the form - POST
@@ -30,8 +31,9 @@ def register():
       pwd = form.password.data
       confirm = form.confirm.data
 
+      
+
       existing_user = User.query.filter(User.emailid == email).first()
-      print(existing_user)
       if existing_user:
           if existing_user.emailid == email:
               flash('Email already registered. Please use a different email.', 'danger')
