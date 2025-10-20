@@ -1,7 +1,7 @@
 from datetime import datetime
+from flask_login import UserMixin
 from . import db
 from sqlalchemy import func 
-from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
     __tablename__='users'
@@ -110,7 +110,6 @@ class Ticket(db.Model):
     price = db.Column(db.Float, nullable=False)
     availability = db.Column(db.Integer, nullable=False) # The number of tickets remaining
     description = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='Available', nullable=False)  # Available, Sold Out
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
     def __repr__(self):
