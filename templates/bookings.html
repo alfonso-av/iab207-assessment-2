@@ -2,70 +2,66 @@
 
 {% block content %}
 
-<!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
+    <!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
     <nav aria-label="breadcrumb">
         <ol class="container breadcrumb mt-5 pt-5">
-            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Homepage</a></li>
+            <li class="breadcrumb-item"><a href="/">Homepage</a></li>
             <li class="breadcrumb-item active text-body" aria-current="page" >Your booking history</li>
         </ol>
     </nav>
-    
+
     <!-- Details the booking history and information about your history as the headings (Consert name, Booking ID, and Date and time of booking) 
     line up with the previous tickets information of those categories below. -->
-    <div class="container border border-3 p-5 mb-5"> 
-        <h1 id="title" class="m-5">Booking History</h1>       
+    <form class="container border border-3 p-5 mb-5">
+        <h1 id="title" class="m-5">Booking History</h1>
             <dl class="row m-4">
-                <dt class="col-sm-3">Event Name / Ticket Type</dt>
+                <dt class="col-sm-3">Concert Name</dt>
                 <dd class="col-sm-9">
                     <dl class="row">
-                        <dt class="col-sm-4">Booking ID / Quantity</dt>
-                        <dt class="col-sm-8">Date and Time of Booking / Total Price</dt>
+                        <dt class="col-sm-4">Booking ID</dt>
+                        <dt class="col-sm-8">Date and Time of booking</dt>
                     </dl>
                 </dd>
             </dl>
 
-        {% if bookings %}
-            {% for booking in bookings %}
-                <div class="border p-4 m-4">
+        <!-- The first concert in your booking history that details the ticket information required -->
+        <div class="border p-4 m-4">
+            <dl class="row">
+                <dd class="col-sm-3">Gorillaz World Tour</dd>
+                <dd class="col-sm-9">
                     <dl class="row">
-                        <dd class="col-sm-3">
-                            <strong>{{ booking.event.name }}</strong>
-                            <br><small class="text-muted">Ticket: {{ booking.ticket.name }}</small>
-                        </dd>
-                        <dd class="col-sm-9">
-                            <dl class="row">
-                                <dd class="col-sm-4">
-                                    #{{ booking.id }}
-                                    <br><small class="text-muted">Qty: {{ booking.quantity }}</small>
-                                </dd>
-                                <dd class="col-sm-8">
-                                    {{ booking.booked_at.strftime('%d/%m/%Y %I:%M %p') }}
-                                    <br><small class="text-muted">Total: ${{ '%.2f'|format(booking.total_price) }}</small>
-                                </dd>
-                            </dl>
-                        </dd>
+                        <dd class="col-sm-4">4823956</dd>
+                        <dd class="col-sm-8">20/03/2022</dd>
+
                     </dl>
-                    
-                    <div class="card mb-3 rounded-3">
-                        {% if booking.event.image %}
-                            <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + booking.event.image) }}" alt="{{ booking.event.name }}">
-                        {% else %}
-                            <img class="card-img-top" src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ booking.event.name }}">
-                        {% endif %}
-                    </div>
+                </dd>
+            </dl>
+        <!-- Adds the image for the concert -->
+        <div class="card mb-3 rounded-3">
+            <img class="card-img-top" src="static/img/gorillaz.jpg" alt="Gorillaz">
+        </div>
+        </div>
+        </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                        <form method="POST" action="{{ url_for('events.cancel_booking', booking_id=booking.id) }}">
-                            <button type="submit" class="btn btn-danger">Cancel Booking</button>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center text-muted m-5">You currently have no bookings.</p>
-        {% endif %}
+        <!-- The second concert in your booking history that details the ticket information required -->
+        <div class="border p-4 m-4">
+            <dl class="row">
+                <dd class="col-sm-3">The Clancy World Tour</dd>
+                <dd class="col-sm-9">
+                    <dl class="row">
+                        <dd class="col-sm-4">4824572</dd>
+                        <dd class="col-sm-8">12/07/2024</dd>
 
-    </div>
+                    </dl>
+                </dd>
+            </dl>
+        <!-- Adds the image for the concert -->
+        <div class="card mb-3 rounded-3">
+            <img class="card-img-top" src="static/img/clancy.jpg" alt="Clancy">
+        </div>
+        </div>
+        </div>
+    </form>
 
 
 {% endblock %}

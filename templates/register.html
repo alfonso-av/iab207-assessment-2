@@ -77,6 +77,14 @@
                 Please enter your password
             </div>
             </div>
+        <h5>Confirm Password</h5>
+            <div class="form-floating mb-3">
+                {{ form.confirm(type="password", class="form-control", id="floatingInput", placeholder="") }}
+                <label for="floatingInput">re-enter password</label>
+            <div class="invalid-feedback">
+                Please re-enter your password
+            </div>
+            </div>
         <div class="d-grid gap-2">
             {{ form.submit(class="btn btn-success btn-lg", id="toastbtn") }}
 
