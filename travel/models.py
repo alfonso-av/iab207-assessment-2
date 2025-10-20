@@ -48,7 +48,7 @@ class Event(db.Model):
     def __repr__(self):
         return f"<Event {self.name} by {self.artist}>"
 
-    # 🔄 Determine the *correct* current status based on real-time conditions
+    # Determine the *correct* current status based on real-time conditions
     def get_dynamic_status(self):
         now = datetime.now()
 
@@ -69,7 +69,7 @@ class Event(db.Model):
         # Otherwise, still open
         return "Open"
 
-    # 🧠 Persist a corrected status in the DB if out of sync
+    # Persist a corrected status in the DB if out of sync
     def update_status(self):
         """Compare current and computed status; sync DB if needed."""
         new_status = self.get_dynamic_status()
@@ -77,7 +77,7 @@ class Event(db.Model):
             self.status = new_status
             db.session.commit()
 
-    # 📊 Shortcut property — access in templates via {{ event.dynamic_status }}
+    # Shortcut property — access in templates via {{ event.dynamic_status }}
     @property
     def dynamic_status(self):
         """Return up-to-date event status based on time, tickets, and cancellation."""

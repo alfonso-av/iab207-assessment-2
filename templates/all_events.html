@@ -2,7 +2,7 @@
 {% block title %}All Events{% endblock %}
 
 {% block content %}
-<div id="homepage">
+<body id="homepage">
   <div class="container-fluid mt-5 px-5"> 
 
     <h1 class="text-center mb-4">All Events</h1>
@@ -159,9 +159,9 @@
 </p>
 
 {% if event.total_availability <= 0 %}
-    <span class="badge bg-danger">Sold Out</span>
+    <span class="badge bg-danger p-2">Sold Out</span>
 {% else %}
-    <span class="badge bg-success">Tickets Available</span>
+    <span class="badge bg-success p-2">Tickets Available</span>
 {% endif %}
                 </p>
 
@@ -175,5 +175,6 @@
       {% endif %}
     </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
+
+

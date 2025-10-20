@@ -15,6 +15,7 @@ authbp = Blueprint('auth',__name__)
 def register():  
   #create the form
     form = RegisterForm()
+    
 
 
     #this line is called when the form - POST
@@ -28,16 +29,21 @@ def register():
       phone = form.phone.data
       address = form.address.data
       pwd = form.password.data
-
+      confirm = form.confirm.data
 
       
-      password_hash = generate_password_hash(pwd)
 
       existing_user = User.query.filter(User.emailid == email).first()
       if existing_user:
           if existing_user.emailid == email:
               flash('Email already registered. Please use a different email.', 'danger')
           return redirect(url_for('auth.register', emailid=email))
+
+      if pwd != confirm:
+        flash('Re-entered password is not the same. Please put in the same password', 'danger')
+        return redirect(url_for('auth.register', pwd=confirm))
+      
+      password_hash = generate_password_hash(pwd)
       
       #create a new user model object
       new_user = User(first_name=fname, surname=sname, phone=phone, address=address, password_hash=password_hash, emailid=email)

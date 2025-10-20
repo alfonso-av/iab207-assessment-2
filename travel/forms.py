@@ -82,10 +82,7 @@ class RegisterForm(FlaskForm):
     address = StringField('Street Address', validators=[InputRequired()])
     #password field
     password = StringField('Password', validators=[InputRequired()])
-  #validator to check if the user entry is equal to password
-   # confirm = PasswordField('Confirm Password', 
-    #      validators=[EqualTo('password', message='Re-enter same as Password')])
- 
+    confirm = PasswordField('Confirm Password', validators=[InputRequired()])
     submit = SubmitField('Register now')
 
 
