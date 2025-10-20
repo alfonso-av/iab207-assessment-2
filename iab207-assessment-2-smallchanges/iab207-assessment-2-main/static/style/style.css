@@ -1,0 +1,268 @@
+
+/* Across the four pages this singular css doc has been used to main;y change the background colour or text colour as well as positioning objects when basic html was limited. Different font types have also been utilised */
+#navs {
+    background-color: rgb(33, 72, 104);
+    padding: 15px 10px;
+
+}
+
+#navs a {
+  color: rgb(223, 238, 255);
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+#navs button, #navs input {
+  background-color: rgb(223, 238, 255);
+  color: #00194f;
+}
+
+.dropdown-menu {
+  background-color: rgb(83, 128, 196);
+
+}
+
+#title {
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  color: rgb(33, 72, 104);
+}
+
+#form {
+  background-color: #ffffff;
+  margin-bottom: 40px;
+}
+
+form h5 {
+  color:rgb(33, 72, 104);
+}
+
+/* This creates the moving gradient effect on the background of the forms page and the home page */
+
+#event_creation_body {
+    background: linear-gradient(-45deg, #3A5683, #4175b0, #00204f, #d1eaff);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+#homepage {
+    background: linear-gradient(-45deg, #2f5274, #03193a, #000000, #053861);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    color: #d1eaff;
+    padding-top: 100px;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+#footer {
+  background-color: rgb(33, 72, 104);
+
+}
+
+#footer a, #footer p, #footer_text {
+  color:#d1eaff;
+}
+
+
+#event_detail span {
+  font-size: 30px;
+}
+
+#event_detail p, #event_detail strong {
+  padding: 10px;
+}
+
+#event_detail h3 {
+  color:rgb(33, 72, 104);
+  padding-top:50px;
+}
+
+#get_tickets a {
+  font-size: 30px;
+}
+
+#special {
+  color:rgb(33, 72, 104);
+}
+
+#ticket_purchase {
+  display:flex;
+}
+
+#carouselExampleIndicators {
+  padding-top: 100px;
+}
+
+#carousel img{
+  height: 400px;
+}
+
+#genre_buttons button {
+  padding: 30px;
+  font-size: 20px;
+  color:#d1eaff;
+  border: 2px solid #d1eaff; 
+  transition-duration: 0.4s;
+}
+
+#genre_buttons button:hover, #button-addon2:hover {
+  background-color: #2f5274;
+  color: white;
+}
+
+
+#button-addon2 {
+  color:#d1eaff;
+  border: 2px solid #d1eaff;
+}
+
+#card_image img {
+    object-fit: cover;
+}
+
+.card-body {
+display: flex;
+flex-direction: column;
+}
+
+pre {
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  text-align: center;
+
+}
+
+#text {
+  color:#000000;
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
+/* ALFONSO */
+/* --- make event cards match homepage card height --- */
+#card_image .card-img-top {
+  height: 220px;      /* adjust this to 210–230px to match your homepage exactly */
+  object-fit: cover;  /* crops oversized images instead of stretching */
+  width: 100%;
+}
+
+/* keep cards equal height and spacing consistent */
+#card_image .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* hover effect for entire card */
+.card {
+  transition: all 0.35s ease;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: relative;
+}
+
+/* 🪄 When hovered: card lifts, glows, and image brightens */
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 140, 255, 0.3);
+}
+
+/* blue glow outlinbe */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(
+    circle at top left,
+    rgba(0, 123, 255, 0.25),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* image animation */
+.card img {
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.card:hover img {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+
+/* button hover transition */
+.card .btn-primary {
+  transition: all 0.3s ease;
+}
+
+.card .btn-primary:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* make entire card clickable */
+.card-link-wrapper {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: all 0.35s ease;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.clickable-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 140, 255, 0.3);
+}
+
+.clickable-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(
+    circle at top left,
+    rgba(0, 123, 255, 0.25),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.clickable-card:hover::before {
+  opacity: 1;
+}
+
+.clickable-card img {
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.clickable-card:hover img {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+
