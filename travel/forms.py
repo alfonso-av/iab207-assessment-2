@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField, PasswordField
-from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError, Email, EqualTo
+from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField
+from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
 
 class MultiCheckboxField(SelectMultipleField):
@@ -51,8 +51,12 @@ class EventForm(FlaskForm):
 class TicketForm(FlaskForm):
     name = StringField('Ticket Name', validators=[InputRequired(), Length(min=1, max=100)])
     price = FloatField('Price', validators=[InputRequired(), NumberRange(min=0, message='Price must be positive')])
-    availability = IntegerField('Availability', validators=[InputRequired(), NumberRange(min=1, message='Availability must be at least 1')])
+    availability = IntegerField('Availability', validators=[InputRequired(), NumberRange(min=0, message='Availability must be 0 or positive')])
     description = TextAreaField('Ticket Description', validators=[InputRequired(), Length(min=1, max=500)])
+    status = SelectField('Ticket Status', choices=[
+        ('Available', 'Available'),
+        ('Sold Out', 'Sold Out')
+    ], default='Available', validators=[InputRequired()])
     submit = SubmitField("Add Ticket")
 
 class CommentForm(FlaskForm):

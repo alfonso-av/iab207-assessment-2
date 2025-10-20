@@ -56,50 +56,39 @@
       </div>
     
     <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
+      <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
       <div id='card_image' class="row">
+        {% for event in events %}
         <div class="col-lg-4 d-flex">
-          <div  class="card m-3">
-            <img  src="static/img/clancy.jpg" class="card-img-top" alt="...">
+          <div class="card m-3">
+            {% if event.image %}
+              <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
+            {% else %}
+              <img src="static/img/logo.png" class="card-img-top" alt="{{ event.name }}">
+            {% endif %}
             <div class="card-body">
-              <h5 class="card-title">The Clancy World Tour</h5>
-              <span class="badge text-bg-success mb-2 p-2">Open</span>
-              <p class="card-text">Brisbane, QLD  - 27th July 8:00pm </p>
-              <p  class="card-text">The tour incorporates an elaborate, cinematic production with extensive visuals, pyrotechnics, and a powerful audio system designed to create a full-body, immersive experience for fans, to support the Breach album.</p>
+              <h5 class="card-title">{{ event.name }}</h5>
+              {% if event.status == 'Open' %}
+                <span class="badge text-bg-success mb-2 p-2">{{ event.status }}</span>
+              {% elif event.status == 'Sold Out' %}
+                <span class="badge text-bg-warning mb-2 p-2">{{ event.status }}</span>
+              {% elif event.status == 'Cancelled' %}
+                <span class="badge text-bg-danger mb-2 p-2">{{ event.status }}</span>
+              {% else %}
+                <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+              {% endif %}
+              <p class="card-text">{{ event.location }} - {{ event.event_date.strftime('%dth %B') }} {{ event.start_time.strftime('%I:%M %p') }}</p>
+              <p class="card-text">{{ event.overview[:150] }}{% if event.overview|length > 150 %}...{% endif %}</p>
               <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary align-self-end">Get Tickets</a>
+                <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-primary align-self-end">Get Tickets</a>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-4 d-flex">
-          <div class="card m-3">
-            <img src="static/img/gorillaz.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title">Gorillaz World Tour</h5>
-
-              <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
-              <p class="card-text">Gold Coast, QLD  - 12th December 9:00pm </p>
-              <p class="card-text">Gorillaz's 25th Anniversary tour pops off with a vibrant mix of live music, electronic innovation, and unique visual spectacle, featuring a visible band led by Damon Albarn, immersive animated visuals, and appearances by numerous guest collaborators.</p>
-              <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 d-flex">
-          <div class="card m-3">
-            <img src="static/img/Hozier.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title">Hozier Unreal Unearth Tour </h5>
-              <span class="badge text-bg-success mb-2 p-2">Open</span>
-              <p class="card-text">Sydney, QLD  - 11th March 7:30pm </p>
-              <p class="card-text">featuring a visually rich production with projections and lighting, and a setlist that drew heavily from the new album, <em>Unreal Unearth</em>, alongside fan favorites. </p>
-              <div class="d-grid gap-2 mt-auto">
-                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
-              </div>
-              </div>
-            </div>
-          </div>
+        {% endfor %}
+      </div>
+    </div>
+    
 
 
     <!-- This section lets the user input a genre so they can later on see all of the concerts that are in that genre-->
@@ -131,5 +120,5 @@
 
     </div>
 
-
 {% endblock %}
+

@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 pycache/
 
+__pycache__/
+*.pyc
+instance/*.db
+
 # C extensions
 *.so
 
