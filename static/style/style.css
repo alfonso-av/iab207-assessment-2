@@ -132,31 +132,3 @@ form h5 {
 display: flex;
 flex-direction: column;
 }
-
-pre {
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  text-align: center;
-
-}
-
-#text {
-  color:#000000;
-  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-}
-
-
-/* ALFONSO */
-/* --- make event cards match homepage card height --- */
-#card_image .card-img-top {
-  height: 220px;      /* adjust this to 210–230px to match your homepage exactly */
-  object-fit: cover;  /* crops oversized images instead of stretching */
-  width: 100%;
-}
-
-/* keep cards equal height and spacing consistent */
-#card_image .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-

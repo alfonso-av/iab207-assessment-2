@@ -1,21 +1,5 @@
 from datetime import datetime
-from flask_login import UserMixin
 from . import db
-
-class User(db.Model, UserMixin):
-    __tablename__='users'
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(100), nullable=False)
-    surname = db.Column(db.String(100), nullable=False)
-    emailid = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(100), nullable=False)
-    address = db.Column(db.String(100), nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)#should be 128 in length to store hash
-
-    def __repr__(self):
-        return "<Email: {}, id: {}>".format(self.emailid, self.id)
-    
-
 
 class Event(db.Model):
     __tablename__ = 'events'
@@ -33,11 +17,7 @@ class Event(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='Open', nullable=False)  # Open, Sold Out, Cancelled, Inactive
-
     
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    user = db.relationship('User', backref='events')
-
     # Relationship with tickets
     tickets = db.relationship('Ticket', backref='event', lazy=True, cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='event', lazy=True, cascade='all, delete-orphan')
@@ -53,6 +33,7 @@ class Ticket(db.Model):
     price = db.Column(db.Float, nullable=False)
     availability = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Available', nullable=False)  # Available, Sold Out
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
     def __repr__(self):
