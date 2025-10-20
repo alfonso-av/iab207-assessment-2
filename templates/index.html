@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -50,21 +49,11 @@
     <div class="container mt-5 p-0">
       <h1 class="text-center">Upcoming Events</h1>
       
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-          <li class="page-item">
-            <a class="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-
-          <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
+      <div class="container mt-5 p-0">
+        <ul class="d-grid gap-2 d-md-flex justify-content-md-end p-3">
+          <p><a class="link-opacity-50-hover" href="{{ url_for('events.list_all') }}">See all events..</a></p>
         </ul>
-      </nav>
+      </div>
     
     <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
       <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
@@ -131,10 +120,5 @@
 
     </div>
 
+{% endblock %}
 
-<<<<<<< HEAD
-{% endblock %}
->>>>>>> main
-=======
-{% endblock %}
->>>>>>> main

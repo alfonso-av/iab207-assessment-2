@@ -164,7 +164,7 @@ def book_tickets():
                 return redirect(url_for('bookings.history')) 
 
         # If no tickets were selected
-        flash("Please select at least one ticket quantity.", 'warning')
+        flash("Please select at least one ticket quantity.", 'danger')
         return redirect(url_for('event_detail', event_id=event_id))
 
 

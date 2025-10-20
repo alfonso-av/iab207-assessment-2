@@ -101,8 +101,61 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        <h5>Street Address</h5>
+        <div class="form-floating mb-3">
+                {{ form.address(class="form-control", id="floatingInput", placeholder="") }}
+            <label for="floatingInput">address</label>
+            <div class="invalid-feedback">
+                Please enter your street address
+            </div>
+        </div>
+        <h5>Password</h5>
+            <div class="form-floating mb-3">
+                {{ form.password(type="password", class="form-control", id="floatingInput", placeholder="") }}
+                <label for="floatingInput">password</label>
+            <div class="invalid-feedback">
+                Please enter your password
+            </div>
+        <h5>Confirm Password</h5>
+            <div class="form-floating mb-3">
+                {{ form.confirm(type="password", class="form-control", id="floatingInput", placeholder="") }}
+                <label for="floatingInput">re-enter password</label>
+            <div class="invalid-feedback">
+                Please re-enter your password
+            </div>
+            </div>
+            </div>
+        <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-success btn-lg", id="toastbtn") }}
+
+        </div>
+
+        <pre>
+Have an account? <a href="/login">Log In</a> now!
+        </pre>
+    </form>
+
+    <script>
+    (() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+        }, false)
+    })
+    })()
+</script>
+
 
     <!-- The footer on all pages of the website that details important links across the website -->
     <footer>

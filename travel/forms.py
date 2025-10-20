@@ -71,3 +71,22 @@ class DestinationForm(FlaskForm):
     image = StringField('Cover Image', validators=[InputRequired()])
     currency = StringField('Currency', validators=[InputRequired()])
     submit = SubmitField("Create")
+
+class LoginForm(FlaskForm):
+  email = StringField('Email', validators=[InputRequired()])
+  password = PasswordField('Password', validators=[InputRequired()])
+  submit = SubmitField('Login')
+
+
+class RegisterForm(FlaskForm):
+    first_name = StringField('First Name', validators=[InputRequired()])
+    surname = StringField('Surname', validators=[InputRequired()])
+    email = StringField('Email ID', validators=[InputRequired() ])
+    phone = StringField('Contact Number', validators=[InputRequired()])
+    address = StringField('Street Address', validators=[InputRequired()])
+    #password field
+    password = StringField('Password', validators=[InputRequired()])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired()])
+    submit = SubmitField('Register now')
+
+
