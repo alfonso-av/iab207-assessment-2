@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="en">
   <head>
@@ -205,3 +206,150 @@
 
 	</footer>
 </html>
+=======
+{% extends 'base.html' %}
+
+{% block content %}
+  <body id="homepage">
+    <!-- Adds carousel to the page and gives a brief first view of what the website is intended to do as well as being aesthetically pleasing -->
+
+    <div id="carouselExampleIndicators" class="container carousel slide" >
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+      <div id="carousel" class="carousel-inner rounded-5"  >
+        <div class="carousel-item active">
+          <img src="static/img/concert 2.gif" class="d-block w-100" alt="...">
+          <div class="carousel-caption">
+            <h2>Discover</h2>
+          <p>Find upcoming local bands</p>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="static/img/concert 1.gif" class="d-block w-100" alt="...">
+          <div class="carousel-caption">
+            <h2>Create</h2>
+          <p>Host your own concert</p>
+          </div>
+       </div>
+        <div class="carousel-item">
+          <img src="static/img/concert 3.gif" class="d-block w-100" alt="...">
+          <div class="carousel-caption">
+            <h2>Variety</h2>
+          <p>Enjoy browsing different genres</p>
+          </div>
+        </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+      </div>
+    </div>
+
+        <!-- Adds arrows to allow for the upcoming events section to eventually display more events when clicked -->
+
+    <div class="container mt-5 p-0">
+      <h1 class="text-center">Upcoming Events</h1>
+      
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    
+    <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
+      <div id='card_image' class="row">
+        <div class="col-lg-4 d-flex">
+          <div  class="card m-3">
+            <img  src="static/img/clancy.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">The Clancy World Tour</h5>
+              <span class="badge text-bg-success mb-2 p-2">Open</span>
+              <p class="card-text">Brisbane, QLD  - 27th July 8:00pm </p>
+              <p  class="card-text">The tour incorporates an elaborate, cinematic production with extensive visuals, pyrotechnics, and a powerful audio system designed to create a full-body, immersive experience for fans, to support the Breach album.</p>
+              <div class="d-grid gap-2 mt-auto">
+                <a href="event_details.html" class="btn btn-primary align-self-end">Get Tickets</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 d-flex">
+          <div class="card m-3">
+            <img src="static/img/gorillaz.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Gorillaz World Tour</h5>
+
+              <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+              <p class="card-text">Gold Coast, QLD  - 12th December 9:00pm </p>
+              <p class="card-text">Gorillaz's 25th Anniversary tour pops off with a vibrant mix of live music, electronic innovation, and unique visual spectacle, featuring a visible band led by Damon Albarn, immersive animated visuals, and appearances by numerous guest collaborators.</p>
+              <div class="d-grid gap-2 mt-auto">
+                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 d-flex">
+          <div class="card m-3">
+            <img src="static/img/Hozier.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Hozier Unreal Unearth Tour </h5>
+              <span class="badge text-bg-success mb-2 p-2">Open</span>
+              <p class="card-text">Sydney, QLD  - 11th March 7:30pm </p>
+              <p class="card-text">featuring a visually rich production with projections and lighting, and a setlist that drew heavily from the new album, <em>Unreal Unearth</em>, alongside fan favorites. </p>
+              <div class="d-grid gap-2 mt-auto">
+                <a href="event_details.html" class="btn btn-primary">Get Tickets</a>
+              </div>
+              </div>
+            </div>
+          </div>
+
+
+    <!-- This section lets the user input a genre so they can later on see all of the concerts that are in that genre-->
+
+    <div class="container text-center">
+      <h1 class="p-5">Search by Genre</h1>
+      <div class="row" id="genre_buttons">
+
+        <button type="button" class="btn col-xs-6">Pop</button>
+        <button type="button" class="btn col-xs-6">Punk</button>
+        <button type="button" class="btn col-xs-12">Rock</button>
+        <button type="button" class="btn col-xs-12">Jazz</button>
+        <button type="button" class="btn col-xs-12">Metal</button>
+        <button type="button" class="btn col-xs-12">Hip-hop</button>
+        <button type="button" class="btn col-xs-12">Country</button>
+        <button type="button" class="btn col-xs-12">Electronic</button>
+
+      </div>
+
+    <!-- This section lets the user input a date so they can later on see all of the concerts that are on that date-->
+      <h1 class="p-5">Search by Date</h1>
+      <div class="row">
+        <div class="input-group input-group-lg mb-3">
+
+            <input id="startDate" class="text-center col-10" type="date" aria-label="Leave a comment" aria-describedby="button-addon2"/>
+            <button class="btn col-2" type="button" id="button-addon2">Go</button>
+        </div>
+      </div>
+
+    </div>
+
+
+{% endblock %}
+>>>>>>> main

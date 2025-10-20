@@ -62,8 +62,8 @@
               {% endif %}
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-3" type="search" placeholder="Search" aria-label="Search"/>
+          <form class="d-flex" role="search" action="{{ url_for('events.search') }}" method="get">
+            <input class="form-control me-3" name="q" type="search" placeholder="Search events..." aria-label="Search" value="{{ request.args.get('q', '') }}"/>
             <button class="btn btn-outline-secondary" type="submit">Search</button>
           </form>
         </div>

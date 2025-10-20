@@ -65,3 +65,15 @@ def login():
 
 
 
+# REMOVED: The placeholder route for /bookings has been removed.
+# @mainbp.route("/bookings")
+# def bookings():
+#     return render_template("bookings.html")
+
+@mainbp.route("/about")
+def about():
+    return render_template("about.html")
+
+@mainbp.route("/faq")
+def faq():
+    return render_template("FAQ.html")
