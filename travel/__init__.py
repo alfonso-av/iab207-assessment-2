@@ -50,10 +50,18 @@ def create_app():
     app.register_blueprint(views.mainbp)
     from . import events
     app.register_blueprint(events.eventbp)
+    app.register_blueprint(events.destbp)
     from . import auth
     app.register_blueprint(auth.authbp)
-  
     
-   
+    # Register the new bookings blueprint
+    from .bookings import bookingsbp
+    app.register_blueprint(bookings.bookingsbp)
 
+    # Create database tables
+    with app.app_context():
+        # Explicitly import all models to ensure the new 'Booking' table is created
+        from .models import User, Event, Booking, Comment  
+        db.create_all()
+    
     return app
