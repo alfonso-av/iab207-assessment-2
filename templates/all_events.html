@@ -153,13 +153,16 @@
                   <strong>Genre:</strong> {{ event.genres or 'Not specified' }}
                 </p>
                 <p class="text-muted mb-3" style="font-size: 0.9rem;">
-                  <strong>Tickets:</strong>
-                  500 available 
-                  {% if event.tickets and event.tickets|length > 0 %}
-                    – from ${{ "%.2f"|format(event.tickets[0].price) }}
-                  {% else %}
-                    – price not listed
-                  {% endif %}
+<p class="card-text">
+    Available Tickets: 
+    <strong>{{ event.total_availability }}</strong> 
+</p>
+
+{% if event.total_availability <= 0 %}
+    <span class="badge bg-danger">Sold Out</span>
+{% else %}
+    <span class="badge bg-success">Tickets Available</span>
+{% endif %}
                 </p>
 
               </div>
