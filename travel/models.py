@@ -48,26 +48,30 @@ class Event(db.Model):
     def __repr__(self):
         return f"<Event {self.name} by {self.artist}>"
 
-    # Determine the *correct* current status based on real-time conditions
     def get_dynamic_status(self):
+        """Determine real-time event status based on time, tickets, and cancellation."""
         now = datetime.now()
 
-        # Cancelled always takes highest priority
+        # Highest priority — Cancelled
         if self.status and self.status.lower() == "cancelled":
             return "Cancelled"
 
-        # Sold Out next priority
-        if self.status and self.status.lower() == "sold out":
+        # Calculate total available tickets
+        total_tickets = sum(t.availability for t in self.tickets)
+
+        # If all tickets are sold out
+        if total_tickets == 0 and len(self.tickets) > 0:
             return "Sold Out"
 
-        # Check if event has ended
+        # Check if the event date/time has already passed
         if self.event_date and self.end_time:
             event_end = datetime.combine(self.event_date, self.end_time)
             if event_end < now:
                 return "Inactive"
 
-        # Otherwise, still open
+        # Default to Open if still upcoming
         return "Open"
+
 
     # Persist a corrected status in the DB if out of sync
     def update_status(self):
