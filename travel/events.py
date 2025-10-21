@@ -532,29 +532,11 @@ def edit(id):
         return redirect(url_for('main.edit_events'))
     
     form = EventForm()
-    
+
     print(f"Request method: {request.method}")
-    if request.method == 'POST':
-        print(f"POST request received for event {id}")
-        print(f"Form data: {request.form}")
-        print(f"Form validation: {form.validate()}")
-        if not form.validate():
-            print(f"Form errors: {form.errors}")
-        
-        # Check if this is a cancellation request first (before form validation)
-        if request.form.get('status') == 'Cancelled':
-            print(f"Event {id} is being cancelled - deleting event")
-            try:
-                db.session.delete(event)
-                db.session.commit()
-                flash('Event has been cancelled and deleted.', 'success')
-                return redirect(url_for('main.edit_events'))
-            except Exception as e:
-                db.session.rollback()
-                flash(f'Error cancelling event: {str(e)}', 'error')
-                return redirect(url_for('events.edit', id=id))
-    else:
-        # Pre-populate form fields manually (excluding image field) for GET requests
+
+    # Pre-populate form fields for GET requests
+    if request.method == 'GET':
         form.name.data = event.name
         form.artist.data = event.artist
         form.overview.data = event.overview
@@ -564,64 +546,39 @@ def edit(id):
         form.start_time.data = event.start_time
         form.end_time.data = event.end_time
         form.status.data = event.status
-        
-        # Pre-populate genres from the comma-separated string
-        if event.genres:
-            form.genres.data = event.genres.split(',')
-            print(f"Genres populated: {form.genres.data}")
-        else:
-            print(f"No genres found for event")
-    
+        form.genres.data = event.genres.split(',') if event.genres else []
+        return render_template('edit_event.html', form=form, event=event)
+
+    # POST request
     if form.validate_on_submit():
-        print(f"Form validated successfully for edit")
-        print(f"Name: {form.name.data}")
-        print(f"Artist: {form.artist.data}")
-        print(f"Genres: {form.genres.data}")
         try:
             # Handle file upload
             if form.image.data and hasattr(form.image.data, 'filename') and form.image.data.filename:
-                try:
-                    image = form.image.data
-                    filename = secure_filename(image.filename)
-                    
-                    # If secure_filename removes everything, use a fallback
-                    if not filename or len(filename) == 0:
-                        # Get file extension
-                        original_name = image.filename
-                        if '.' in original_name:
-                            ext = original_name.split('.')[-1].lower()
-                            filename = f"event_image_{int(time.time())}.{ext}"
-                        else:
-                            filename = f"event_image_{int(time.time())}.jpg"
-                    
-                    if filename:
-                        # Create uploads directory if it doesn't exist
-                        project_root = os.path.dirname(current_app.root_path)
-                        upload_dir = os.path.join(project_root, 'static', 'uploads')
-                        os.makedirs(upload_dir, exist_ok=True)
-                        
-                        # Delete old image if it exists
-                        if event.image:
-                            old_image_path = os.path.join(upload_dir, event.image)
-                            if os.path.exists(old_image_path):
-                                os.remove(old_image_path)
-                        
-                        # Save new image
-                        full_path = os.path.join(upload_dir, filename)
-                        image.save(full_path)
-                        event.image = filename
-                        print(f"Image saved to: {full_path}")
-                except Exception as img_error:
-                    print(f"Error handling image upload: {str(img_error)}")
-                    print(f"Image data type: {type(form.image.data)}")
-                    print(f"Image data: {form.image.data}")
-                    # Continue without updating the image
-            
-            # Update event fields
-            print(f"Updating event fields...")
-            print(f"Old name: {event.name}")
-            print(f"New name: {form.name.data}")
-            
+                image = form.image.data
+                filename = secure_filename(image.filename)
+                if not filename:
+                    original_name = image.filename
+                    if '.' in original_name:
+                        ext = original_name.split('.')[-1].lower()
+                        filename = f"event_image_{int(time.time())}.{ext}"
+                    else:
+                        filename = f"event_image_{int(time.time())}.jpg"
+                
+                project_root = os.path.dirname(current_app.root_path)
+                upload_dir = os.path.join(project_root, 'static', 'uploads')
+                os.makedirs(upload_dir, exist_ok=True)
+
+                # Remove old image if exists
+                if event.image:
+                    old_image_path = os.path.join(upload_dir, event.image)
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+
+                full_path = os.path.join(upload_dir, filename)
+                image.save(full_path)
+                event.image = filename
+
+            # Update fields
             event.name = form.name.data
             event.artist = form.artist.data
             event.overview = form.overview.data
@@ -631,32 +588,33 @@ def edit(id):
             event.event_date = form.event_date.data
             event.start_time = form.start_time.data
             event.end_time = form.end_time.data
-            
-            event.status = form.status.data
-            
-            # Check if all tickets have 0 availability and auto-set to Sold Out
+
+            # ✅ Instead of deleting cancelled events, just mark them
+            if form.status.data == 'Cancelled':
+                event.status = 'Cancelled'
+                flash(f"The event '{event.name}' has been marked as Cancelled.", 'warning')
+            else:
+                event.status = form.status.data
+                flash(f"The event '{event.name}' has been successfully updated.", 'success')
+
+            # Auto-check if all tickets are sold out
             total_availability = sum(ticket.availability for ticket in event.tickets)
             if total_availability == 0 and event.tickets:
-                print(f"All tickets sold out for event {event.id} - setting status to Sold Out")
                 event.status = 'Sold Out'
-            
-            print(f"Event name after update: {event.name}")
+
             db.session.commit()
-            print(f"Database committed successfully")
-            
-            flash('Event updated successfully!', 'success')
             return redirect(url_for('events.show', id=event.id))
-            
+
         except Exception as e:
             db.session.rollback()
-            flash(f'Error updating event: {str(e)}', 'error')
+            flash(f'Error updating event: {str(e)}', 'danger')
+            return redirect(url_for('events.edit', id=event.id))
+
     else:
-        print(f"Form validation failed")
-        print(f"Form errors: {form.errors}")
-        for field, errors in form.errors.items():
-            print(f"Field {field}: {errors}")
-    
-    return render_template('edit_event.html', form=form, event=event)
+        flash('Form validation failed. Please check the fields.', 'danger')
+        print(form.errors)
+        return render_template('edit_event.html', form=form, event=event)
+
 
 @eventbp.route('/tickets/<int:ticket_id>/edit', methods=['POST'])
 @login_required
