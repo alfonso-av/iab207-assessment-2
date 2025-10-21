@@ -266,3 +266,8 @@ pre {
   filter: brightness(1.15);
 }
 
+#error {
+  font-family: "bitcount grid single";
+
+
+}

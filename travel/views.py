@@ -10,7 +10,7 @@ project (folder)
 '''
 travel/views.py
 '''
-from flask import Blueprint,render_template, redirect, url_for, request, flash
+from flask import Blueprint,render_template, redirect, url_for, request, flash, session
 from .forms import RegisterForm
 from . import db
 from .models import User
@@ -23,6 +23,9 @@ mainbp = Blueprint('main', __name__)
 
 @mainbp.route('/')
 def index():
+    print(session)
+    session.pop('_flashes', None)
+    
     from .models import Event
     # Show events that are Open or Sold Out (not Cancelled or Inactive)
     events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.desc()).limit(6).all()
@@ -40,3 +43,8 @@ def about():
 @mainbp.route("/faq")
 def faq():
     return render_template("FAQ.html")
+
+@mainbp.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('profile.html'), 404

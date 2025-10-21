@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, session
 from flask_login import login_required, current_user
 from .models import db, Booking, Event, Ticket 
 
@@ -23,6 +23,7 @@ def history():
 @bookingsbp.route('/cancel/<int:booking_id>', methods=['POST'])
 @login_required
 def cancel_booking(booking_id):
+
     """
     Handles the cancellation of a specific booking.
     """

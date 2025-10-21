@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from werkzeug.utils import secure_filename
 import os
 import time
@@ -15,6 +15,7 @@ eventbp = Blueprint('events', __name__, url_prefix='/events')
 
 @eventbp.route('/')
 def list_all():
+    session.pop('_flashes', None)
     """Display all events"""
     # Show all events, ordered by date
     events = Event.query.order_by(Event.event_date.asc()).all()
@@ -81,6 +82,7 @@ def search():
 
 @eventbp.route('/<int:id>')
 def show(id):
+
     """Show event details, including tickets and comments"""
     event = Event.query.get_or_404(id)
     comment_form = CommentForm()
@@ -185,6 +187,7 @@ def create():
 @eventbp.route('/<int:event_id>/book', methods=['POST'])
 @login_required
 def process_booking(event_id):
+
     """
     Processes the ticket booking form submission.
     """
@@ -230,14 +233,14 @@ def process_booking(event_id):
                     total_quantity += quantity
 
         if total_quantity == 0:
-            flash("You must select at least one ticket to proceed.", 'warning')
+            flash("You must select at least one ticket to proceed.", 'danger')
             return redirect(url_for('events.show', id=event_id))
 
         # Commit saves BOTH the new booking AND the reduced ticket availability
         db.session.commit() 
         
         flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
-        
+
         return redirect(url_for('bookings.history')) 
 
     except Exception as e:
@@ -332,35 +335,4 @@ def add_comment(event_id):
 # Legacy destination routes for backward compatibility
 destbp = Blueprint('destination', __name__, url_prefix='/destinations')
 
-@destbp.route('/<id>')
-def show_destination(id):
-    destination = get_destination()
-    return render_template('destinations/show.html', destination=destination)
 
-@destbp.route('/create', methods = ['GET', 'POST'])
-def create_destination():
-    from .forms import DestinationForm
-    print('Method type: ', request.method)
-    form = DestinationForm()
-    if form.validate_on_submit():
-        print('Successfully created new travel destination')
-        # return redirect(url_for('destination.create'))
-    return render_template('destinations/create.html', form=form)
-
-def get_destination():
-    from .models import Destination, Comment
-    # creating the description of Brazil
-    b_desc = """Brazil is considered an advanced emerging economy.
-     It has the ninth largest GDP in the world by nominal, and eight by PPP measures. 
-     It is one of the world\'s major breadbaskets, being the largest producer of coffee for the last 150 years."""
-     # an image location
-    image_loc = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFyC8pBJI2AAHLpAVih41_yWx2xxLleTtdshAdk1HOZQd9ZM8-Ag'
-    destination = Destination('Brazil', b_desc,image_loc, 'R$10')
-    # a comment
-    comment = Comment("Sam", "Visited during the olympics, was great", '2023-08-12 11:00:00')
-    destination.set_comments(comment)
-    comment = Comment("Bill", "free food!", '2023-08-12 11:00:00')
-    destination.set_comments(comment)
-    comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
-    destination.set_comments(comment)
-    return destination
