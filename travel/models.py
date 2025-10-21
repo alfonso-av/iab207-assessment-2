@@ -130,7 +130,6 @@ class Ticket(db.Model):
     price = db.Column(db.Float, nullable=False)
     availability = db.Column(db.Integer, nullable=False) # The number of tickets remaining
     description = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='Available', nullable=False)  # Available, Sold Out
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
     def update_status(self):

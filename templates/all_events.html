@@ -48,7 +48,7 @@
         <label for="category" class="form-label mb-1">Genre</label>
         <select class="form-select" id="category" name="category">
           <option value="">--</option>
-          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic'] %}
+          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic', 'Other'] %}
           {% for genre in genres %}
             <option value="{{ genre }}" {% if request.args.get('category') == genre %}selected{% endif %}>{{ genre }}</option>
           {% endfor %}
@@ -172,7 +172,7 @@
         </div>
         {% endfor %}
       {% else %}
-        <p class="text-center text-muted">No events found.</p>
+        <p class="text-center">No events found.</p>
       {% endif %}
     </div>
   </div>

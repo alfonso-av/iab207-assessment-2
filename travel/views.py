@@ -10,7 +10,7 @@ project (folder)
 '''
 travel/views.py
 '''
-from flask import Blueprint,render_template, redirect, url_for, request, flash
+from flask import Blueprint,render_template, redirect, url_for, request, flash, session
 from .forms import RegisterForm
 from . import db
 from .models import User
@@ -72,3 +72,8 @@ def about():
 @mainbp.route("/faq")
 def faq():
     return render_template("FAQ.html")
+
+@mainbp.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('profile.html'), 404

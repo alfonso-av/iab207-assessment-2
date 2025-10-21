@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from werkzeug.utils import secure_filename
 import os
 import time
@@ -171,6 +171,7 @@ def list_all():
 
 @eventbp.route('/<int:id>')
 def show(id):
+
     """Show event details, including tickets and comments"""
     event = Event.query.get_or_404(id)
     comment_form = CommentForm()
@@ -214,36 +215,30 @@ def create():
         try:
             # Handle file upload
             image_filename = None
-            if form.image.data and hasattr(form.image.data, 'filename') and form.image.data.filename:
-                try:
-                    image = form.image.data
-                    filename = secure_filename(image.filename)
-                    
-                    # If secure_filename removes everything, use a fallback
-                    if not filename or len(filename) == 0:
-                        # Get file extension
-                        original_name = image.filename
-                        if '.' in original_name:
-                            ext = original_name.split('.')[-1].lower()
-                            filename = f"event_image_{int(time.time())}.{ext}"
-                        else:
-                            filename = f"event_image_{int(time.time())}.jpg"
-                    
-                    if filename:
-                        # Create uploads directory if it doesn't exist
-                        # current_app.root_path points to the travel directory, so we need to go up one level
-                        project_root = os.path.dirname(current_app.root_path)
-                        upload_dir = os.path.join(project_root, 'static', 'uploads')
-                        os.makedirs(upload_dir, exist_ok=True)
-                        image_filename = filename
-                        full_path = os.path.join(upload_dir, filename)
-                        image.save(full_path)
-                        print(f"Image saved to: {full_path}")
-                except Exception as img_error:
-                    print(f"Error handling image upload: {str(img_error)}")
-                    print(f"Image data type: {type(form.image.data)}")
-                    print(f"Image data: {form.image.data}")
-                    # Continue without the image
+            if form.image.data:
+                image = form.image.data
+                filename = secure_filename(image.filename)
+                
+                # If secure_filename removes everything, use a fallback
+                if not filename or len(filename) == 0:
+                    # Get file extension
+                    original_name = image.filename
+                    if '.' in original_name:
+                        ext = original_name.split('.')[-1].lower()
+                        filename = f"event_image_{int(time.time())}.{ext}"
+                    else:
+                        filename = f"event_image_{int(time.time())}.jpg"
+                
+                if filename:
+                    # Create uploads directory if it doesn't exist
+                    # current_app.root_path points to the travel directory, so we need to go up one level
+                    project_root = os.path.dirname(current_app.root_path)
+                    upload_dir = os.path.join(project_root, 'static', 'uploads')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    image_filename = filename
+                    full_path = os.path.join(upload_dir, filename)
+                    image.save(full_path)
+                    print(f"Image saved to: {full_path}")
             
             # Create event
             event = Event(
@@ -285,9 +280,8 @@ def create():
                         ticket = Ticket(
                             name=ticket_names[i],
                             price=float(ticket_prices[i]),
-                            availability=availability,
+                            availability=int(ticket_availabilities[i]),
                             description=ticket_descriptions[i],
-                            status=ticket_status,
                             event_id=event.id
                         )
                         db.session.add(ticket)
@@ -313,6 +307,18 @@ def create():
     # get request 
     return render_template('event_creation.html', form=form)
 
+@eventbp.route('/<int:event_id>/book', methods=['POST'])
+@login_required
+def process_booking(event_id):
+
+    """
+    Processes the ticket booking form submission.
+    """
+    event = Event.query.get_or_404(event_id)
+    form_data = request.form
+    
+    user_id = current_user.id
+    total_quantity = 0
 
 @eventbp.route('/test-create', methods=['GET'])
 @login_required
@@ -345,6 +351,9 @@ def test_create():
     except Exception as e:
         return f"Error creating test event: {str(e)}"
 
+        if total_quantity == 0:
+            flash("You must select at least one ticket to proceed.", 'danger')
+            return redirect(url_for('events.show', id=event_id))
 
 @eventbp.route('/migrate-ticket-status', methods=['GET'])
 @login_required
@@ -390,6 +399,10 @@ def migrate_ticket_status():
         
         return f"Migration completed! Added status column and updated {updated_count} existing tickets."
         
+        flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
+
+        return redirect(url_for('bookings.history')) 
+
     except Exception as e:
         db.session.rollback()
         return f"Migration failed: {str(e)}"
@@ -462,49 +475,27 @@ def all_events():
 def add_ticket(event_id):
     """Add a ticket to an event"""
     event = Event.query.get_or_404(event_id)
+    form = TicketForm()
     
-    try:
-        # Get form data directly (from modal)
-        name = request.form.get('name')
-        price = float(request.form.get('price'))
-        availability = int(request.form.get('availability'))
-        description = request.form.get('description')
-        status = request.form.get('status', 'Available')
-        
-        # Validate required fields
-        if not name or not description:
-            flash('Please fill in all required fields.', 'error')
-            return redirect(url_for('events.edit', id=event_id))
-        
-        # Auto-set status based on availability (override manual selection)
-        ticket_status = 'Sold Out' if availability == 0 else status
-        
-        ticket = Ticket(
-            name=name,
-            price=price,
-            availability=availability,
-            description=description,
-            status=ticket_status,
-            event_id=event_id
-        )
-        
-        db.session.add(ticket)
-        db.session.flush()  # Get the ticket ID
-        
-        # Update event status based on all tickets
-        update_event_status_based_on_tickets(event)
-        print(f"Updated event {event_id} status to: {event.status}")
-        
-        db.session.commit()
-        
-        flash('Ticket added successfully!', 'success')
-    except ValueError as e:
-        flash('Please enter valid numbers for price and availability.', 'error')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error adding ticket: {str(e)}', 'error')
+    if form.validate_on_submit():
+        try:
+            ticket = Ticket(
+                name=form.name.data,
+                price=form.price.data,
+                availability=form.availability.data,
+                description=form.description.data,
+                event_id=event_id
+            )
+            
+            db.session.add(ticket)
+            db.session.commit()
+            
+            flash('Ticket added successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding ticket: {str(e)}', 'error')
     
-    return redirect(url_for('events.edit', id=event_id))
+    return redirect(url_for('events.show', id=event_id))
 
 
 @eventbp.route('/<int:id>/add_comment', methods=['POST'])
@@ -782,3 +773,4 @@ def get_destination():
     comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
     destination.set_comments(comment)
     return destination
+
