@@ -25,25 +25,25 @@
         </nav>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="row">
-                <div class="col-12">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
+            {% if messages %}
+                <div class="row">
+                    <div class="col-12">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
         {% endwith %}
 
         <div class="container pt-5 pb-5">
             {% if event.image %}
-                <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='img/gorillaz.jpg') }}'">
+                <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='img/error.png') }}'">
             {% else %}
-                <img class="card-img-top" src="{{ url_for('static', filename='img/gorillaz.jpg') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
+                <img class="card-img-top" src="{{ url_for('static', filename='img/error.png') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
             {% endif %}
         </div>
 

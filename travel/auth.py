@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, session
 from .forms import LoginForm, RegisterForm
 from .models import User
 from sqlalchemy.exc import IntegrityError
@@ -15,7 +15,6 @@ authbp = Blueprint('auth',__name__)
 def register():  
   #create the form
     form = RegisterForm()
-    
 
 
     #this line is called when the form - POST
@@ -60,13 +59,15 @@ def register():
 
 @authbp.route('/login', methods = ['GET', 'POST'])
 def login():
+
+
   form = LoginForm()
   error=None
   if(form.validate_on_submit()):
     user_email = form.email.data
     password = form.password.data
     u1 = User.query.filter_by(emailid=user_email).first()
-    
+
         #if there is no user with that name
     if u1 is None:
       error='Email does not exist'
@@ -80,13 +81,14 @@ def login():
       return redirect(url_for('main.index'))
     else:
       print(error)
-      print("nooo")
-      flash(error)
     #it comes here when it is a get method
+    flash(error)
   return render_template('Log_In.html', form=form, heading='Login')
 
 
 @authbp.route('/logout')
 def logout():
   logout_user()
+
   return render_template('index.html')
+
