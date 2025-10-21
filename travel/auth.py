@@ -16,8 +16,6 @@ def register():
   #create the form
     form = RegisterForm()
 
-    if '_flashes' in session:
-      session['_flashes'].clear()
 
     #this line is called when the form - POST
     if form.validate_on_submit():
@@ -92,4 +90,5 @@ def login():
 @authbp.route('/logout')
 def logout():
   logout_user()
+
   return render_template('index.html')
