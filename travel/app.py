@@ -35,10 +35,7 @@ csrf = CSRFProtect(app)
 from flask_bootstrap import Bootstrap5
 bootstrap = Bootstrap5(app)
 
-# --- Error Handlers ---
-@app.errorhandler(404)
-def not_found(e):
-    return render_template('404.html'), 404
+
 
 # --- Utility Functions (For demonstration, will move to auth blueprint later) ---
 

@@ -98,6 +98,26 @@ class Event(db.Model):
         # Return 0 if no tickets exist (sum is None), otherwise return the total
         return total if total is not None else 0
 
+    @classmethod
+    def update_all_statuses(cls):
+        """Update status for all events based on current date/time"""
+        events = cls.query.all()
+        updated_count = 0
+        
+        for event in events:
+            old_status = event.status
+            new_status = event.get_dynamic_status()
+            
+            if old_status != new_status:
+                event.status = new_status
+                updated_count += 1
+        
+        if updated_count > 0:
+            db.session.commit()
+            print(f"Updated {updated_count} event statuses")
+        
+        return updated_count
+
     def __repr__(self):
         return f"Event: {self.name} on {self.event_date.strftime('%Y-%m-%d')}"
 
@@ -112,8 +132,15 @@ class Ticket(db.Model):
     description = db.Column(db.Text, nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
+    def update_status(self):
+        """Update ticket status based on availability"""
+        if self.availability <= 0:
+            self.status = 'Sold Out'
+        else:
+            self.status = 'Available'
+    
     def __repr__(self):
-        return f"Ticket: {self.name} - ${self.price}"
+        return f"Ticket: {self.name} - ${self.price} ({self.status})"
 
 
 class Comment(db.Model):
@@ -122,7 +149,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
     author = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
     def __repr__(self):
@@ -134,7 +161,7 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
-    booked_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False) 
+    booked_at = db.Column(db.DateTime, default=datetime.now, nullable=False) 
     
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)

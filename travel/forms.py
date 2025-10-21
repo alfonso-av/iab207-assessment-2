@@ -15,6 +15,17 @@ def validate_genres(form, field):
     if len(field.data) >= 9:  # 9 is the total number of genre options
         raise ValidationError('Please select specific genres, not all of them.')
 
+def validate_event_date(form, field):
+    """Custom validator for event date - must be at least 1 day in the future"""
+    from datetime import date, timedelta
+    
+    if field.data:
+        today = date.today()
+        tomorrow = today + timedelta(days=1)
+        
+        if field.data < tomorrow:
+            raise ValidationError('Event date must be at least 1 day in the future.')
+
 class EventForm(FlaskForm):
     name = StringField('Concert Name', validators=[InputRequired(), Length(min=1, max=100)])
     artist = StringField('Artist/Band Name', validators=[InputRequired(), Length(min=1, max=100)])
@@ -36,14 +47,13 @@ class EventForm(FlaskForm):
     ], validators=[validate_genres])
     
     image = FileField('Concert Image', validators=[FileAllowed(['jpg', 'png', 'gif', 'jpeg', 'JPG', 'PNG', 'GIF', 'JPEG', 'webp', 'WEBP'], 'Images only!')])
-    event_date = DateField('Event Date', validators=[InputRequired()])
+    event_date = DateField('Event Date', validators=[InputRequired(), validate_event_date])
     start_time = TimeField('Start Time', validators=[InputRequired()])
     end_time = TimeField('End Time', validators=[InputRequired()])
     status = SelectField('Event Status', choices=[
         ('Open', 'Open'),
         ('Sold Out', 'Sold Out'),
-        ('Cancelled', 'Cancelled'),
-        ('Inactive', 'Inactive')
+        ('Cancelled', 'Cancelled')
     ], default='Open', validators=[InputRequired()])
     
     submit = SubmitField("Create Event")
@@ -55,9 +65,10 @@ class TicketForm(FlaskForm):
     description = TextAreaField('Ticket Description', validators=[InputRequired(), Length(min=1, max=500)])
     submit = SubmitField("Add Ticket")
 
+
 class CommentForm(FlaskForm):
     text = TextAreaField('Comment', validators=[InputRequired(), Length(min=1, max=500)])
-    author = StringField('Your Name', validators=[InputRequired(), Length(min=1, max=100)])
+    author = StringField('Your Name')  # No validators needed since it's auto-populated
     submit = SubmitField('Submit Comment')
 
 # Legacy forms for backward compatibility
