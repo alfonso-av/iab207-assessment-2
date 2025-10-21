@@ -236,8 +236,9 @@ def process_booking(event_id):
         # Commit saves BOTH the new booking AND the reduced ticket availability
         db.session.commit() 
         
-        flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
-        
+        flash(f"Successfully booked {total_quantity} tickets for {event.name}!", 'success')
+
+
         return redirect(url_for('bookings.history')) 
 
     except Exception as e:
@@ -267,11 +268,12 @@ def cancel_booking(booking_id):
         # Delete the booking record
         db.session.delete(booking_to_cancel)
         db.session.commit()
-        flash(f'Booking #{booking_id} successfully cancelled.', 'success')
+        flash(f'Booking  cancelled.', 'success')
         
     except Exception as e:
         db.session.rollback()
         flash('An error occurred during cancellation. Please try again.', 'danger')
+
 
     return redirect(url_for('bookings.history'))
 
