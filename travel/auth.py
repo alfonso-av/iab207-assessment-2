@@ -59,8 +59,7 @@ def register():
 
 @authbp.route('/login', methods = ['GET', 'POST'])
 def login():
-  print(session)
-  session.pop('_flashes', None)
+
 
   form = LoginForm()
   error=None
@@ -92,3 +91,4 @@ def logout():
   logout_user()
 
   return render_template('index.html')
+
