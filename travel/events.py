@@ -108,8 +108,11 @@ def process_booking(event_id):
 
         # Commit saves BOTH the new booking AND the reduced ticket availability
         db.session.commit() 
-        
+        # Recalculate and update event status if now sold out
+        event.update_status()
+
         flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
+        # flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
         
         return redirect(url_for('bookings.history')) 
 
@@ -166,7 +169,13 @@ def list_all():
     Event.update_all_statuses()
     
     # Show only active events (Open and Sold Out), ordered by date
-    events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.asc()).all()
+    # events = Event.query.filter(Event.status.in_(['Open', 'Inactive'])).order_by(Event.event_date.asc()).all()
+    # Get all unique statuses in the database
+    all_statuses = [status[0] for status in db.session.query(Event.status).distinct().all()]
+
+    # Use dynamically in filter
+    events = Event.query.filter(Event.status.in_(all_statuses)).order_by(Event.event_date.asc()).all()
+
     return render_template('all_events.html', events=events)
 
 
@@ -418,6 +427,8 @@ def all_events():
     sort_alpha = request.args.get('sort_alpha')
     category = request.args.get('category')
     status = request.args.get('status')
+
+    
     
     # Update all event statuses based on current date/time first
     Event.update_all_statuses()
@@ -432,12 +443,8 @@ def all_events():
     if category:
         events = events.filter(Event.genres.ilike(f"%{category}%"))
 
-    # Status filter
-    if status:
+    if status and status.strip() != "":
         events = events.filter(Event.status.ilike(f"%{status}%"))
-    else:
-        # By default, only show active events (Open, Sold Out) - exclude Inactive and Cancelled
-        events = events.filter(Event.status.in_(['Open', 'Sold Out']))
 
     # sorting options
     if sort_date == "newest":

@@ -48,7 +48,7 @@
         <label for="category" class="form-label mb-1">Genre</label>
         <select class="form-select" id="category" name="category">
           <option value="">--</option>
-          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic', 'Other'] %}
+          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic'] %}
           {% for genre in genres %}
             <option value="{{ genre }}" {% if request.args.get('category') == genre %}selected{% endif %}>{{ genre }}</option>
           {% endfor %}
@@ -60,9 +60,9 @@
         <label for="status" class="form-label mb-1">Status</label>
         <select class="form-select" id="status" name="status">
           <option value="">Show All</option>
-          {% set statuses = ['Open', 'Cancelled', 'Sold Out'] %}
+          {% set statuses = ['Open', 'Inactive', 'Cancelled', 'Sold Out'] %}
           {% for s in statuses %}
-            <option value="{{ s }}" {% if request.args.get('status', 'Open') == s %}selected{% endif %}>{{ s }}</option>
+            <option value="{{ s }}" {% if request.args.get('status', 'Show All') == s %}selected{% endif %}>{{ s }}</option>
           {% endfor %}
         </select>
       </div>
@@ -82,14 +82,13 @@
           <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
             <div class="card m-3 w-100 clickable-card shadow-sm">
               {% if event.image %}
-                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='img/gorillaz.jpg') }}'">
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
               {% else %}
-                <img src="{{ url_for('static', filename='img/gorillaz.jpg') }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
+                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
               {% endif %}
 
               <div class="card-body">
                 <h5 class="card-title">{{ event.name }}</h5>
-                <p class="card-text mb-2"><strong>By:</strong> {{ event.artist }}</p>
 
                 <!-- Status badge (Open, Sold Out, etc.) -->
                 {% if event.dynamic_status %}
@@ -141,30 +140,32 @@
 
                 <hr class="my-2">
 
-                <!-- Extra details (author, genre, tickets) -->
+                <!-- Extra details -->
                 <p class="card-text text-muted mb-1">
-                  <strong>Published by:</strong> 
-                  {% if event.user %}
-                    {{ event.user.first_name }} {{ event.user.surname }}
-                  {% else %}
-                    Unknown
-                  {% endif %}
+                  <strong>Artist:</strong> {{ event.artist or 'Unknown' }}
                 </p>
                 <p class="text-muted mb-1" style="font-size: 0.9rem;">
                   <strong>Genre:</strong> {{ event.genres or 'Not specified' }}
                 </p>
-                <p class="text-muted mb-3" style="font-size: 0.9rem;">
-<p class="card-text">
-    Available Tickets: 
-    <strong>{{ event.total_availability }}</strong> 
-</p>
 
-{% if event.total_availability <= 0 %}
-    <span class="badge bg-danger p-2">Sold Out</span>
-{% else %}
-    <span class="badge bg-success p-2">Tickets Available</span>
-{% endif %}
-                </p>
+                <!-- Ticket info (no bottom badges) -->
+                {% set current_status = event.status.lower() %}
+                {% if current_status == 'open' %}
+                  <p class="card-text mb-1">
+                    <strong>Tickets:</strong> Tickets available
+                    {% if event.tickets and event.tickets|length > 0 %}
+                      – from ${{ "%.2f"|format(event.tickets[0].price) }}
+                    {% endif %}
+                  </p>
+                {% elif current_status in ['sold out', 'cancelled', 'inactive'] %}
+                  <p class="card-text mb-1">
+                    <strong>Tickets:</strong> Tickets not available
+                  </p>
+                {% else %}
+                  <p class="card-text mb-1">
+                    <strong>Tickets:</strong> Not specified
+                  </p>
+                {% endif %}
 
               </div>
             </div>
@@ -172,10 +173,8 @@
         </div>
         {% endfor %}
       {% else %}
-        <p class="text-center">No events found.</p>
+        <p class="text-center text-muted">No events found.</p>
       {% endif %}
     </div>
   </div>
-  {% endblock %}
-
-
+{% endblock %}
