@@ -32,10 +32,10 @@
               <a class="nav-link active" aria-current="page" href="{{ url_for('events.create') }}">Create Event</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Edit Event</a>
+              <a class="nav-link" href="{{ url_for('main.edit_events') }}">Edit Event</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/bookings">Bookings</a>
+              <a class="nav-link" href="{{ url_for('bookings.history') }}">Bookings</a>
             </li>
             <li class="nav-item dropdown ">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -59,7 +59,7 @@
                       }}</span></a></li>
               <a class="nav-link active" aria-current="page" href="{{ url_for('auth.logout') }}">Log Out</a>
               {% else %}
-              <a class="nav-link active" aria-current="page" href="/login">Log In</a>
+              <a class="nav-link active" aria-current="page" href="{{ url_for('auth.login') }}">Log In</a>
               {% endif %}
             </li>
           </ul>
@@ -84,9 +84,9 @@
     <!-- The footer on all pages of the website that details important links across the website -->
       <footer class="py-3 my-4"> 
         <ul class="nav justify-content-center border-bottom pb-3 mb-3"> 
-          <li class="nav-item"><a href="/" class="nav-link px-2">Home</a></li> 
-          <li class="nav-item"><a href="/faq" class="nav-link px-2">FAQs</a></li> 
-          <li class="nav-item"><a href="/about" class="nav-link px-2">About</a></li> 
+          <li class="nav-item"><a href="{{ url_for('main.index') }}" class="nav-link px-2">Home</a></li> 
+          <li class="nav-item"><a href="{{ url_for('main.faq') }}" class="nav-link px-2">FAQs</a></li> 
+          <li class="nav-item"><a href="{{ url_for('main.about') }}" class="nav-link px-2">About</a></li> 
         </ul> 
         <p class="text-center" id="footer_text">© 2025 SoundSculpt, Inc</p> 
       </footer> 

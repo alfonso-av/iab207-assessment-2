@@ -23,13 +23,42 @@ mainbp = Blueprint('main', __name__)
 
 @mainbp.route('/')
 def index():
-    print(session)
-    session.pop('_flashes', None)
-    
     from .models import Event
+    
+    # Update all event statuses based on current date/time
+    Event.update_all_statuses()
+    
     # Show events that are Open or Sold Out (not Cancelled or Inactive)
     events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.desc()).limit(6).all()
-    return render_template('index.html', events=events)
+    
+
+
+    # Filter out events where all tickets have 0 availability
+    filtered_events = []
+    for event in events:
+        if event.tickets:
+            total_availability = sum(ticket.availability for ticket in event.tickets)
+            if total_availability > 0 or event.status == 'Sold Out':
+                filtered_events.append(event)
+        else:
+            # Events with no tickets can still be shown if they're Open
+            if event.status == 'Open':
+                filtered_events.append(event)
+    
+    return render_template('index.html', events=filtered_events)
+
+
+@mainbp.route('/edit-events')
+@login_required
+def edit_events():
+    """Display only events created by the current user for editing"""
+    from .models import Event
+    
+    # Update all event statuses based on current date/time
+    Event.update_all_statuses()
+    
+    events = Event.query.filter_by(user_id=current_user.id).order_by(Event.event_date.desc()).all()
+    return render_template('edit_events.html', events=events)
 
 # REMOVED: The placeholder route for /bookings has been removed.
 # @mainbp.route("/bookings")

@@ -60,7 +60,7 @@
         <label for="status" class="form-label mb-1">Status</label>
         <select class="form-select" id="status" name="status">
           <option value="">Show All</option>
-          {% set statuses = ['Open', 'Inactive', 'Cancelled', 'Sold Out'] %}
+          {% set statuses = ['Open', 'Cancelled', 'Sold Out'] %}
           {% for s in statuses %}
             <option value="{{ s }}" {% if request.args.get('status', 'Open') == s %}selected{% endif %}>{{ s }}</option>
           {% endfor %}
@@ -82,13 +82,14 @@
           <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
             <div class="card m-3 w-100 clickable-card shadow-sm">
               {% if event.image %}
-                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='img/gorillaz.jpg') }}'">
               {% else %}
-                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
+                <img src="{{ url_for('static', filename='img/gorillaz.jpg') }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
               {% endif %}
 
               <div class="card-body">
                 <h5 class="card-title">{{ event.name }}</h5>
+                <p class="card-text mb-2"><strong>By:</strong> {{ event.artist }}</p>
 
                 <!-- Status badge (Open, Sold Out, etc.) -->
                 {% if event.dynamic_status %}

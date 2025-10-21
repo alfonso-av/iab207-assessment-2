@@ -40,6 +40,8 @@ def cancel_booking(booking_id):
     ticket = Ticket.query.get(booking.ticket_id)
     if ticket:
         ticket.availability += booking.quantity
+        # Update ticket status based on new availability
+        ticket.update_status()
     
     # 4. Delete the Booking Record
     db.session.delete(booking)
