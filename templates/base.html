@@ -43,14 +43,14 @@
               </a>
                 <!-- The home page features a genre tab as to gain quick access to these options-->
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Pop</a></li>
-                <li><a class="dropdown-item" href="#">Punk</a></li>
-                <li><a class="dropdown-item" href="#">Rock</a></li>
-                <li><a class="dropdown-item" href="#">Jazz</a></li>
-                <li><a class="dropdown-item" href="#">Metal</a></li>
-                <li><a class="dropdown-item" href="#">Hip-Hop</a></li>
-                <li><a class="dropdown-item" href="#">Country</a></li>
-                <li><a class="dropdown-item" href="#">Electronic</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Pop')">Pop</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Punk')">Punk</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Rock')">Rock</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Jazz')">Jazz</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Metal')">Metal</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Hip-Hop')">Hip-Hop</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Country')">Country</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterByGenre('Electronic')">Electronic</a></li>
               </ul>
             </li>
             <li class="nav-item">
@@ -75,6 +75,14 @@
         {% block content %}
         {% endblock %}
 
+      <script>
+        function filterByGenre(genre) {
+          const baseUrl = "{{ url_for('events.all_events') }}";
+          // Build the URL to behave exactly like the filter form
+          const targetUrl = `${baseUrl}?sort_date=&category=${encodeURIComponent(genre)}&status=`;
+          window.location.href = targetUrl;
+        }
+      </script>
 
     </body>
 
