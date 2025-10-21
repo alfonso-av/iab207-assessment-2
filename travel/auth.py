@@ -88,7 +88,7 @@ def login():
 
 @authbp.route('/logout')
 def logout():
-  logout_user()
-
-  return render_template('index.html')
+    logout_user()
+    session.pop('_flashes', None)
+    return redirect(url_for('main.index'))
 

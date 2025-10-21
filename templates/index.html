@@ -129,7 +129,30 @@
   </div>
 
   <!-- Genre Search Section -->
-  <div class="container text-center">
+   <div class="container text-center">
+   <h1 class="p-5">Search by Genre</h1>
+   <div class="row" id="genre_buttons">
+      <button type="button" class="btn col-xs-6" onclick="filterByGenre('Pop')">Pop</button>
+      <button type="button" class="btn col-xs-6" onclick="filterByGenre('Punk')">Punk</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Rock')">Rock</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Jazz')">Jazz</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Metal')">Metal</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Hip Hop')">Hip-hop</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Country')">Country</button>
+      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Electronic')">Electronic</button>
+    </div>
+
+    <script>
+      function filterByGenre(genre) {
+        const baseUrl = "{{ url_for('events.all_events') }}";
+        // build url identical to the filter form submission (just used the url when the filters actually get applied)
+        const targetUrl = `${baseUrl}?sort_date=&category=${encodeURIComponent(genre)}&status=`;
+        window.location.href = targetUrl;
+      }
+    </script>
+
+
+  <!-- <div class="container text-center">
     <h1 class="p-5">Search by Genre</h1>
     <div class="row" id="genre_buttons">
       <button type="button" class="btn col-xs-6">Pop</button>
@@ -140,15 +163,8 @@
       <button type="button" class="btn col-xs-12">Hip-hop</button>
       <button type="button" class="btn col-xs-12">Country</button>
       <button type="button" class="btn col-xs-12">Electronic</button>
-    </div>
+    </div> -->
 
-    <!-- Date Search -->
-    <h1 class="p-5">Search by Date</h1>
-    <div class="row">
-      <div class="input-group input-group-lg mb-3">
-        <input id="startDate" class="text-center col-10" type="date" aria-label="Select a date" aria-describedby="button-addon2"/>
-        <button class="btn col-2" type="button" id="button-addon2">Go</button>
-      </div>
-    </div>
+    
   </div>
 {% endblock %}
