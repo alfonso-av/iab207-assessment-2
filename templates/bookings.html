@@ -48,9 +48,10 @@
                     
                     <div class="card mb-3 rounded-3">
                         {% if booking.event.image %}
-                            <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + booking.event.image) }}" alt="{{ booking.event.name }}">
+                            <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + booking.event.image) }}" alt="{{ booking.event.name }}" style="max-height: 400px; object-fit: cover;">
+
                         {% else %}
-                            <img class="card-img-top" src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ booking.event.name }}">
+                            <img class="card-img-top" src="{{ url_for('static', filename='img/error.png') }}" alt="{{ booking.event.name }}">
                         {% endif %}
                     </div>
 

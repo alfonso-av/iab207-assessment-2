@@ -2,39 +2,68 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <!-- Allows a logged in user to create their own concert by detailing information about it -->
     <form id="form" class="container border border-3 p-5 rounded-5" method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="m-5">
             <h1 id="title">Create your Concert</h1>
+            <p class="text-muted"><span class="text-danger">*</span> indicates required fields</p>
         </div>
-        <h5>Concert Name</h5>
+        <h5>Concert Name <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.name(class="form-control", id="floatingInput", placeholder="") }}
+            {{ form.name(class="form-control", id="floatingInput", placeholder="", required=true) }}
             <label for="floatingInput">Name your concert</label>
         </div>
-        <h5>Artist/Band Name</h5>
+        {% if form.name.errors and request.method == 'POST' %}
+            <div class="text-danger mb-3">
+                {% for error in form.name.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <h5>Artist/Band Name <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.artist(class="form-control", id="floatingInput", placeholder="") }}
+            {{ form.artist(class="form-control", id="floatingInput", placeholder="", required=true) }}
             <label for="floatingInput">Who is performing</label>
         </div>
-        <h5>Overview</h5>
+        {% if form.artist.errors and request.method == 'POST' %}
+            <div class="text-danger mb-3">
+                {% for error in form.artist.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <h5>Overview <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.overview(class="form-control", id="floatingInput", placeholder="") }}
+            {{ form.overview(class="form-control", id="floatingInput", placeholder="", required=true) }}
             <label for="floatingInput">Give a short summary of your event</label>
         </div>
-        <h5>Location</h5>
+        <h5>Location <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.location(class="form-control", id="floatingInput", placeholder="") }}
+            {{ form.location(class="form-control", id="floatingInput", placeholder="", required=true) }}
             <label for="floatingInput">Specify where it's held</label>
         </div>
-        <h5>Description</h5>
+        <h5>Description <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.description(class="form-control", placeholder="Description", id="floatingTextarea2", style="height: 200px") }}
+            {{ form.description(class="form-control", placeholder="Description", id="floatingTextarea2", style="height: 200px", required=true) }}
             <label for="floatingTextarea2">Let us know all about your concert</label>
         </div>
 
-        <h5>Genre/s</h5>
+        <h5>Genre/s <span class="text-danger">*</span></h5>
         <div class="p-3">
             {% for subfield in form.genres %}
             <div class="form-check">
@@ -43,38 +72,52 @@
             </div>
             {% endfor %}
         </div>
+        {% if form.genres.errors and request.method == 'POST' %}
+            <div class="text-danger mb-3">
+                {% for error in form.genres.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
 
 
         <div class="mb-3 mt-3">
             <h5 for="formFile" class="form-label">Concert Image</h5>
             {{ form.image(class="form-control", id="formFile") }}
         </div>
-        <h5>Date and Time</h5>
+        <h5>Date and Time <span class="text-danger">*</span></h5>
         <div class="row g-3">
             <div class="col-md">
                 <div class="form-floating">
-                    {{ form.event_date(class="form-control", id="startDate") }}
+                    {{ form.event_date(class="form-control", id="startDate", required=true) }}
                     <label for="startDate">Event Date</label>
                 </div>
+                {% if form.event_date.errors and request.method == 'POST' %}
+                    <div class="text-danger mt-1">
+                        {% for error in form.event_date.errors %}
+                            <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             <div class="col-md">
                 <div class="form-floating">
-                    {{ form.start_time(class="form-control", id="floatingInput", placeholder="") }}
+                    {{ form.start_time(class="form-control", id="floatingInput", placeholder="", required=true) }}
                     <label for="floatingInput">Start Time (In 24 hour format)</label>
                 </div>
             </div>
             <div class="col-md">
                 <div class="form-floating">
-                    {{ form.end_time(class="form-control", id="floatingInput", placeholder="") }}
+                    {{ form.end_time(class="form-control", id="floatingInput", placeholder="", required=true) }}
                     <label for="floatingInput">End Time (In 24 hour format)</label>
                 </div>
             </div>
         </div>
         
         <!-- Event Status -->
-        <h5>Event Status</h5>
+        <h5>Event Status <span class="text-danger">*</span></h5>
         <div class="form-floating mb-3">
-            {{ form.status(class="form-select", id="floatingSelect") }}
+            {{ form.status(class="form-select", id="floatingSelect", required=true) }}
             <label for="floatingSelect">Select Event Status</label>
         </div>
         <div class="border mt-5 p-5 pb-0">
@@ -214,6 +257,66 @@
         }
         
         // Form will submit naturally - no JavaScript interference needed
+        </script>
+
+        <!-- Client-side validation for required fields -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('form');
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                // Form submission validation only
+                form.addEventListener('submit', function(e) {
+                    let hasErrors = false;
+                    
+                    // Clear any previous validation states
+                    requiredFields.forEach(field => {
+                        field.classList.remove('is-invalid', 'is-valid');
+                        hideFieldError(field);
+                    });
+                    
+                    // Check each required field
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            field.classList.add('is-invalid');
+                            showFieldError(field, 'This field is required');
+                            hasErrors = true;
+                        }
+                    });
+                    
+                    // Check genres (special case)
+                    const genreCheckboxes = form.querySelectorAll('input[name="genres"]:checked');
+                    if (genreCheckboxes.length === 0) {
+                        const genreContainer = form.querySelector('.p-3');
+                        showFieldError(genreContainer, 'Please select at least one genre');
+                        hasErrors = true;
+                    }
+                    
+                    if (hasErrors) {
+                        e.preventDefault();
+                        // Scroll to first error
+                        const firstError = form.querySelector('.is-invalid');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                });
+                
+                function showFieldError(field, message) {
+                    hideFieldError(field);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback';
+                    errorDiv.textContent = message;
+                    field.parentNode.appendChild(errorDiv);
+                }
+                
+                function hideFieldError(field) {
+                    const existingError = field.parentNode.querySelector('.invalid-feedback');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                }
+            });
         </script>
     </form>
 

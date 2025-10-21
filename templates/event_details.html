@@ -39,52 +39,50 @@
         {% endif %}
         {% endwith %}
 
+        <!-- Shows all concert information previously inputted by the creator -->
         <div class="container pt-5 pb-5">
             {% if event.image %}
-                <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='img/gorillaz.jpg') }}'">
+                <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
             {% else %}
-                <img class="card-img-top" src="{{ url_for('static', filename='img/gorillaz.jpg') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
+                <img class="card-img-top" src="{{ url_for('static', filename='img/error.png') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
             {% endif %}
         </div>
-
         <div id="event_detail" class="container">
             {% if event.status == 'Open' %}
-                <span class="badge text-bg-success mb-2 fs-5">{{ event.status }}</span>
+                <span class="badge text-bg-success mb-2">{{ event.status }}</span>
             {% elif event.status == 'Sold Out' %}
-                <span class="badge text-bg-warning mb-2 fs-5">{{ event.status }}</span>
+                <span class="badge text-bg-warning mb-2">{{ event.status }}</span>
             {% elif event.status == 'Cancelled' %}
-                <span class="badge text-bg-danger mb-2 fs-5">{{ event.status }}</span>
+                <span class="badge text-bg-danger mb-2">{{ event.status }}</span>
             {% else %}
-                <span class="badge text-bg-secondary mb-2 fs-5">{{ event.status }}</span>
+                <span class="badge text-bg-secondary mb-2">{{ event.status }}</span>
             {% endif %}
+            <h1 class="p-5"><strong>{{ event.name }}</strong></h1>
+    
             
-            <h1 class="display-4">{{ event.name }}</h1>
             <h5 id="special" class="p-2">By {{ event.artist }}</h5>
-            
             <p>{{ event.overview }}</p>
-
             <h3>Genre</h3>
-            <p>
-                {% for genre in event.genres.split(',') %}
-                    <span class="badge bg-primary me-2">{{ genre.strip() }}</span>
-                {% endfor %}
-            </p>
-
+            <p>{{ event.genres }}</p>
             <h3>Date and Time</h3>
-            <p>{{ event.event_date.strftime('%A, %d %B %Y') }}</p>
+            <p>{{ event.event_date.strftime('%A, %d %B %Y') }}  {{ event.start_time.strftime('%I:%M %p') }}</p>
             <p>{{ event.start_time.strftime('%I:%M %p') }} - {{ event.end_time.strftime('%I:%M %p') }}</p>
-            <!-- iframe allows for google maps to show the inputted location -->
+             <!-- iframe allows for google maps to show the inputted location -->
             <h3>Location</h3>
             <p>{{ event.location }}</p>
             <iframe src="https://maps.google.com/maps?q={{ event.location|urlencode }}&t=&z=13&ie=UTF8&iwloc=&output=embed" height="450" style="border:0;" class="container rounded mx-auto d-block" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-
-            <h3 class="mt-4">About</h3>
+    
+            <h3>About</h3>
             <strong id="special">{{ event.artist }}</strong>
             <p>{{ event.description }}</p>
         
-            <h3 id="tickets" class="mt-4">Tickets</h3>
+            <h3 id="tickets">Tickets</h3>
         </div>
-
+    
+        <!-- Allows for users to select and buy tickets.
+         It includes information on the tickets, an information button popover, and allows the user to select the amount of tickets they want,
+         0 is entered by default as to ensure users don't accidently purchase multiple tickets.
+         If all fields arent entered a warning message will pop up -->
         <div class="container">
             <div class="border p-4 p-md-5 m-4 shadow-sm rounded">
                 <form method="POST" action="{{ url_for('events.process_booking', event_id=event.id) }}">
@@ -135,27 +133,26 @@
                 </form>
             </div>
         </div>
-
-    <!-- Displays comments left by previous users and allows for a logged in user to submit their own comment on the concert -->        
+    
+        <!-- Displays comments left by previous users and allows for a logged in user to submit their own comment on the concert -->
         <div id="event_detail" class="container">
             <h3 id="comments">Comments</h3>
             <form method="POST" action="{{ url_for('events.add_comment', id=event.id) }}">
                 {{ comment_form.hidden_tag() }}
-                <div class="input-group mb-3">
-                    {{ comment_form.text(class_="form-control", placeholder="Add a comment...", aria_label="Comment text") }}
-                    {{ comment_form.submit(class_="btn btn-outline-primary", id="button-addon2") }}
+                <div class="input-group input-group-lg mb-3">
+                    {{ comment_form.text(class="form-control", placeholder="Leave a comment", aria_label="Leave a comment", aria_describedby="button-addon2") }}
+                    {{ comment_form.submit(class="btn btn-outline-primary", id="button-addon2") }}
                 </div>
-                <div class="input-group mb-3">
-                    {{ comment_form.author(class_="form-control", placeholder="Your name") }}
-                </div>
+                <!-- Author field is now hidden and auto-populated -->
+                {{ comment_form.author(type="hidden") }}
             </form>
             
             {% if event.comments %}
                 {% for comment in event.comments %}
-                <div class="border p-4 my-3 rounded">
-                    <h6 class="mb-0"><strong>{{ comment.author }}</strong></h6>
+                <div class="border p-5 m-4">
+                    <h6 id="special">by {{ comment.author }}</h6>
                     <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
-                    <p class="mt-2 mb-0">{{ comment.text }}</p>
+                    <p>{{ comment.text }}</p>
                 </div>
                 {% endfor %}
             {% else %}
