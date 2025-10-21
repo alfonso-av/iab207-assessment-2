@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from werkzeug.utils import secure_filename
 import os
-import time
+import time 
 from datetime import datetime 
 from .models import db, Event, Ticket, Comment, Booking, User, Destination 
 from .forms import EventForm, TicketForm, CommentForm, DestinationForm 
@@ -307,18 +307,7 @@ def create():
     # get request 
     return render_template('event_creation.html', form=form)
 
-@eventbp.route('/<int:event_id>/book', methods=['POST'])
-@login_required
-def process_booking(event_id):
 
-    """
-    Processes the ticket booking form submission.
-    """
-    event = Event.query.get_or_404(event_id)
-    form_data = request.form
-    
-    user_id = current_user.id
-    total_quantity = 0
 
 @eventbp.route('/test-create', methods=['GET'])
 @login_required
@@ -350,10 +339,6 @@ def test_create():
         
     except Exception as e:
         return f"Error creating test event: {str(e)}"
-
-        if total_quantity == 0:
-            flash("You must select at least one ticket to proceed.", 'danger')
-            return redirect(url_for('events.show', id=event_id))
 
 @eventbp.route('/migrate-ticket-status', methods=['GET'])
 @login_required
@@ -399,9 +384,7 @@ def migrate_ticket_status():
         
         return f"Migration completed! Added status column and updated {updated_count} existing tickets."
         
-        flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
 
-        return redirect(url_for('bookings.history')) 
 
     except Exception as e:
         db.session.rollback()
