@@ -2,17 +2,29 @@
 
 {% block content %}
 
-<!-- Shows what directory you're in on the website and gives you easy access to heading back to the homepage -->
-    <nav aria-label="breadcrumb">
+<nav aria-label="breadcrumb">
         <ol class="container breadcrumb mt-5 pt-5">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Homepage</a></li>
             <li class="breadcrumb-item active text-body" aria-current="page" >Your booking history</li>
         </ol>
     </nav>
     
-    <!-- Details the booking history and information about your history as the headings (Consert name, Booking ID, and Date and time of booking) 
-    line up with the previous tickets information of those categories below. -->
     <div class="container border border-3 p-5 mb-5"> 
+    
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% endwith %}
         <h1 id="title" class="m-5">Booking History</h1>       
             <dl class="row m-4">
                 <dt class="col-sm-3">Event Name / Ticket Type</dt>
