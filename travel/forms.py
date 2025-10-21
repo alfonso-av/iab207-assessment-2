@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField
-from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError
+from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField, PasswordField
+from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError, Email, EqualTo
 from wtforms.widgets import CheckboxInput, ListWidget
 
 class MultiCheckboxField(SelectMultipleField):
@@ -14,6 +14,17 @@ def validate_genres(form, field):
         raise ValidationError('Please select at least one genre.')
     if len(field.data) >= 9:  # 9 is the total number of genre options
         raise ValidationError('Please select specific genres, not all of them.')
+
+def validate_event_date(form, field):
+    """Custom validator for event date - must be at least 1 day in the future"""
+    from datetime import date, timedelta
+    
+    if field.data:
+        today = date.today()
+        tomorrow = today + timedelta(days=1)
+        
+        if field.data < tomorrow:
+            raise ValidationError('Event date must be at least 1 day in the future.')
 
 class EventForm(FlaskForm):
     name = StringField('Concert Name', validators=[InputRequired(), Length(min=1, max=100)])
@@ -36,14 +47,13 @@ class EventForm(FlaskForm):
     ], validators=[validate_genres])
     
     image = FileField('Concert Image', validators=[FileAllowed(['jpg', 'png', 'gif', 'jpeg', 'JPG', 'PNG', 'GIF', 'JPEG', 'webp', 'WEBP'], 'Images only!')])
-    event_date = DateField('Event Date', validators=[InputRequired()])
+    event_date = DateField('Event Date', validators=[InputRequired(), validate_event_date])
     start_time = TimeField('Start Time', validators=[InputRequired()])
     end_time = TimeField('End Time', validators=[InputRequired()])
     status = SelectField('Event Status', choices=[
         ('Open', 'Open'),
         ('Sold Out', 'Sold Out'),
-        ('Cancelled', 'Cancelled'),
-        ('Inactive', 'Inactive')
+        ('Cancelled', 'Cancelled')
     ], default='Open', validators=[InputRequired()])
     
     submit = SubmitField("Create Event")
@@ -59,9 +69,10 @@ class TicketForm(FlaskForm):
     ], default='Available', validators=[InputRequired()])
     submit = SubmitField("Add Ticket")
 
+
 class CommentForm(FlaskForm):
     text = TextAreaField('Comment', validators=[InputRequired(), Length(min=1, max=500)])
-    author = StringField('Your Name', validators=[InputRequired(), Length(min=1, max=100)])
+    author = StringField('Your Name')  # No validators needed since it's auto-populated
     submit = SubmitField('Submit Comment')
 
 # Legacy forms for backward compatibility

@@ -2,8 +2,15 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 import os
 import time
-from .models import db, Event, Ticket, Comment
-from .forms import EventForm, TicketForm, CommentForm
+from datetime import datetime 
+from .models import db, Event, Ticket, Comment, Booking, User, Destination 
+from .forms import EventForm, TicketForm, CommentForm, DestinationForm 
+from flask_login import login_required, current_user
+from sqlalchemy import or_
+
+# Use of blueprint to group routes, 
+# name - first argument is the blue print name 
+# import name - second argument - helps identify the root url for it 
 
 def update_event_status_based_on_tickets(event):
     """Helper function to update event status based on ticket availability"""
@@ -20,64 +27,11 @@ def update_event_status_based_on_tickets(event):
         # Some tickets available = Open (unless manually set otherwise)
         if event.status not in ['Cancelled', 'Inactive']:
             event.status = 'Open'
-from datetime import datetime 
-from .models import db, Event, Ticket, Comment, Booking, User, Destination 
-from .forms import EventForm, TicketForm, CommentForm, DestinationForm 
-from flask_login import login_required, current_user
-from sqlalchemy import or_
 
-# Use of blueprint to group routes, 
-# name - first argument is the blue print name 
-# import name - second argument - helps identify the root url for it 
+
+
 eventbp = Blueprint('events', __name__, url_prefix='/events')
 
-@eventbp.route('/')
-def list_all():
-    """Display all events"""
-    # Show all events, ordered by date
-    events = Event.query.order_by(Event.event_date.asc()).all()
-    return render_template('all_events.html', events=events)
-
-
-@eventbp.route('/all', methods=['GET'])
-def all_events():
-    query = request.args.get('query', '')
-    sort_date = request.args.get('sort_date')
-    sort_alpha = request.args.get('sort_alpha')
-    category = request.args.get('category')
-    status = request.args.get('status')
-    
-    events = Event.query
-
-    # search query
-    if query:
-        events = events.filter(Event.name.ilike(f"%{query}%"))
-
-    # genre filter
-    if category:
-        events = events.filter(Event.genres.ilike(f"%{category}%"))
-
-    # Status filter
-    if status:
-        events = events.filter(Event.status.ilike(f"%{status}%"))
-
-    # sorting options
-    if sort_date == "newest":
-        events = events.order_by(Event.event_date.desc())
-    elif sort_date == "oldest":
-        events = events.order_by(Event.event_date.asc())
-    elif sort_alpha == "az":
-        events = events.order_by(Event.name.asc())
-    elif sort_alpha == "za":
-        events = events.order_by(Event.name.desc())
-
-    events = events.all()
-
-    # automatically update event statuses based on current time and conditions
-    for event in events:
-        event.update_status()
-
-    return render_template('all_events.html', events=events, query=query)
 
 
 @eventbp.route('/search')
@@ -97,125 +51,6 @@ def search():
 
     return render_template('all_events.html', events=events, query=query)
 
-@eventbp.route('/<int:id>')
-def show(id):
-    """Show event details, including tickets and comments"""
-    event = Event.query.get_or_404(id)
-    comment_form = CommentForm()
-    # Fetch all associated tickets for display on the detail page
-    tickets = Ticket.query.filter_by(event_id=event.id).order_by(Ticket.price).all()
-    # Fetch all associated comments, ordered by newest first
-    comments = Comment.query.filter_by(event_id=event.id).order_by(Comment.created_at.desc()).all()
-    if current_user.is_authenticated:
-        comment_form.author.data = f"{current_user.first_name} {current_user.surname}"     
-    return render_template('event_details.html', event=event, comment_form=comment_form, tickets=tickets, comments=comments )
-
-
-@eventbp.route('/create', methods=['GET', 'POST'])
-def create():
-    """Create a new event"""
-    form = EventForm()
-    
-    # post request 
-    if form.validate_on_submit():
-        try:
-            # Handle file upload
-            image_filename = None
-            if form.image.data and hasattr(form.image.data, 'filename') and form.image.data.filename:
-                try:
-                    image = form.image.data
-                    filename = secure_filename(image.filename)
-                    
-                    # If secure_filename removes everything, use a fallback
-                    if not filename or len(filename) == 0:
-                        # Get file extension
-                        original_name = image.filename
-                        if '.' in original_name:
-                            ext = original_name.split('.')[-1].lower()
-                            filename = f"event_image_{int(time.time())}.{ext}"
-                        else:
-                            filename = f"event_image_{int(time.time())}.jpg"
-                    
-                    if filename:
-                        # Create uploads directory if it doesn't exist
-                        # current_app.root_path points to the travel directory, so we need to go up one level
-                        project_root = os.path.dirname(current_app.root_path)
-                        upload_dir = os.path.join(project_root, 'static', 'uploads')
-                        os.makedirs(upload_dir, exist_ok=True)
-                        image_filename = filename
-                        full_path = os.path.join(upload_dir, filename)
-                        image.save(full_path)
-                        print(f"Image saved to: {full_path}")
-                except Exception as img_error:
-                    print(f"Error handling image upload: {str(img_error)}")
-                    print(f"Image data type: {type(form.image.data)}")
-                    print(f"Image data: {form.image.data}")
-                    # Continue without the image
-            
-            # Create event
-            event = Event(
-                name=form.name.data,
-                artist=form.artist.data,
-                overview=form.overview.data,
-                location=form.location.data,
-                description=form.description.data,
-                genres=','.join(form.genres.data) if form.genres.data else '',
-                image=image_filename,
-                event_date=form.event_date.data,
-                start_time=form.start_time.data,
-                end_time=form.end_time.data,
-                status=form.status.data
-            )
-            
-            db.session.add(event)
-            db.session.flush() # Get the event ID
-
-            
-            # Handle ticket data
-            ticket_names = request.form.getlist('ticket_names')
-            ticket_prices = request.form.getlist('ticket_prices')
-            ticket_availabilities = request.form.getlist('ticket_availabilities')
-            ticket_descriptions = request.form.getlist('ticket_descriptions')
-                        
-            # Create tickets if any were added
-            if ticket_names and ticket_prices and ticket_availabilities and ticket_descriptions:
-                for i in range(len(ticket_names)):
-                    if ticket_names[i] and ticket_prices[i] and ticket_availabilities[i] and ticket_descriptions[i]:
-                        availability = int(ticket_availabilities[i])
-                        # Auto-set status based on availability
-                        ticket_status = 'Sold Out' if availability == 0 else 'Available'
-                        
-                        ticket = Ticket(
-                            name=ticket_names[i],
-                            price=float(ticket_prices[i]),
-                            availability=availability,
-                            description=ticket_descriptions[i],
-                            status=ticket_status,
-                            event_id=event.id
-                        )
-                        db.session.add(ticket)
-            
-            # Update event status based on all tickets
-            update_event_status_based_on_tickets(event)
-            print(f"Updated new event {event.id} status to: {event.status}")
-            
-            db.session.commit()
-            
-            flash(f'Event "{event.name}" created successfully!.', 'success')
-            tickets_added_count += 1
-         
-
-            db.session.commit()
-            
-            flash(f'Event "{event.name}" created successfully! {tickets_added_count} ticket type(s) added.', 'success')
-            return redirect(url_for('events.show', id=event.id))
-            
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error creating event: {str(e)}', 'error')
-    
-    # get request 
-    return render_template('event_creation.html', form=form)
 
 @eventbp.route('/<int:event_id>/book', methods=['POST'])
 @login_required
@@ -249,6 +84,9 @@ def process_booking(event_id):
                     
                     # Reduce Stock
                     ticket.availability -= quantity 
+                    
+                    # Update ticket status based on new availability
+                    ticket.update_status()
                     
                     booking_price = quantity * ticket.price
                     
@@ -297,6 +135,10 @@ def cancel_booking(booking_id):
         # Re-increment ticket availability
         ticket = booking_to_cancel.ticket
         ticket.availability += booking_to_cancel.quantity
+        
+        # Update ticket status based on new availability
+        ticket.update_status()
+        
         db.session.add(ticket)
         
         # Delete the booking record
@@ -310,7 +152,313 @@ def cancel_booking(booking_id):
 
     return redirect(url_for('bookings.history'))
 
+
+
+
+
+#  ------------------- Razia ------------------------------------
+
+@eventbp.route('/')
+def list_all():
+    """Display all events"""
+    # Update all event statuses based on current date/time
+    Event.update_all_statuses()
+    
+    # Show only active events (Open and Sold Out), ordered by date
+    events = Event.query.filter(Event.status.in_(['Open', 'Sold Out'])).order_by(Event.event_date.asc()).all()
+    return render_template('all_events.html', events=events)
+
+
+@eventbp.route('/<int:id>')
+def show(id):
+    """Show event details, including tickets and comments"""
+    event = Event.query.get_or_404(id)
+    comment_form = CommentForm()
+    # Fetch all associated tickets for display on the detail page
+    tickets = Ticket.query.filter_by(event_id=event.id).order_by(Ticket.price).all()
+    # Fetch all associated comments, ordered by newest first
+    comments = Comment.query.filter_by(event_id=event.id).order_by(Comment.created_at.desc()).all()
+    if current_user.is_authenticated:
+        comment_form.author.data = f"{current_user.first_name} {current_user.surname}"     
+    return render_template('event_details.html', event=event, comment_form=comment_form, tickets=tickets, comments=comments )
+
+
+@eventbp.route('/create', methods=['GET', 'POST'])
+@login_required
+def create():
+    """Create a new event"""
+    form = EventForm()
+    
+    # For GET requests, ensure form is clean (no validation errors)
+    if request.method == 'GET':
+        form = EventForm()  # Create a fresh form instance
+        # Clear any potential errors from previous submissions
+        form.errors.clear()
+    
+    # Debug: Check database connection and table structure
+    try:
+        from .models import Event
+        event_count = Event.query.count()
+        print(f"Database connection OK. Current event count: {event_count}")
+    except Exception as db_error:
+        print(f"Database connection error: {db_error}")
+    
+    # post request 
+    print(f"Form submitted. Method: {request.method}")
+    print(f"Form validation result: {form.validate()}")
+    print(f"Form errors: {form.errors}")
+    print(f"Current user: {current_user.id if current_user.is_authenticated else 'Not authenticated'}")
+    
+    if form.validate_on_submit():
+        print(f"Form validation passed for user: {current_user.id} ({current_user.first_name})")
+        try:
+            # Handle file upload
+            image_filename = None
+            if form.image.data and hasattr(form.image.data, 'filename') and form.image.data.filename:
+                try:
+                    image = form.image.data
+                    filename = secure_filename(image.filename)
+                    
+                    # If secure_filename removes everything, use a fallback
+                    if not filename or len(filename) == 0:
+                        # Get file extension
+                        original_name = image.filename
+                        if '.' in original_name:
+                            ext = original_name.split('.')[-1].lower()
+                            filename = f"event_image_{int(time.time())}.{ext}"
+                        else:
+                            filename = f"event_image_{int(time.time())}.jpg"
+                    
+                    if filename:
+                        # Create uploads directory if it doesn't exist
+                        # current_app.root_path points to the travel directory, so we need to go up one level
+                        project_root = os.path.dirname(current_app.root_path)
+                        upload_dir = os.path.join(project_root, 'static', 'uploads')
+                        os.makedirs(upload_dir, exist_ok=True)
+                        image_filename = filename
+                        full_path = os.path.join(upload_dir, filename)
+                        image.save(full_path)
+                        print(f"Image saved to: {full_path}")
+                except Exception as img_error:
+                    print(f"Error handling image upload: {str(img_error)}")
+                    print(f"Image data type: {type(form.image.data)}")
+                    print(f"Image data: {form.image.data}")
+                    # Continue without the image
+            
+            # Create event
+            event = Event(
+                name=form.name.data,
+                artist=form.artist.data,
+                overview=form.overview.data,
+                location=form.location.data,
+                description=form.description.data,
+                genres=','.join(form.genres.data) if form.genres.data else '',
+                image=image_filename,
+                event_date=form.event_date.data,
+                start_time=form.start_time.data,
+                end_time=form.end_time.data,
+                status=form.status.data,
+                user_id=current_user.id  # Assign the current user as the event creator
+            )
+            
+            print(f"About to add event to database: {event.name} by {event.artist}")
+            db.session.add(event)
+            db.session.flush()  # Get the event ID
+            print(f"Created event with ID: {event.id}, User ID: {event.user_id}")
+            print(f"Event data: name={event.name}, artist={event.artist}, location={event.location}")
+            
+            # Handle ticket data
+            ticket_names = request.form.getlist('ticket_names')
+            ticket_prices = request.form.getlist('ticket_prices')
+            ticket_availabilities = request.form.getlist('ticket_availabilities')
+            ticket_descriptions = request.form.getlist('ticket_descriptions')
+            
+            # Create tickets if any were added
+            if ticket_names and ticket_prices and ticket_availabilities and ticket_descriptions:
+                for i in range(len(ticket_names)):
+                    if ticket_names[i] and ticket_prices[i] and ticket_availabilities[i] and ticket_descriptions[i]:
+                        availability = int(ticket_availabilities[i])
+                        
+                        # Set initial ticket status based on availability
+                        ticket_status = 'Available' if availability > 0 else 'Sold Out'
+                        
+                        ticket = Ticket(
+                            name=ticket_names[i],
+                            price=float(ticket_prices[i]),
+                            availability=availability,
+                            description=ticket_descriptions[i],
+                            status=ticket_status,
+                            event_id=event.id
+                        )
+                        db.session.add(ticket)
+            
+            # Update event status based on all tickets
+            update_event_status_based_on_tickets(event)
+            print(f"Updated new event {event.id} status to: {event.status}")
+            
+            db.session.commit()
+            print(f"Event {event.id} successfully committed to database")
+            
+            flash('Event created successfully!', 'success')
+            print(f"Redirecting to event details page for event {event.id}")
+            return redirect(url_for('events.show', id=event.id))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error creating event: {str(e)}")
+            flash(f'Error creating event: {str(e)}', 'error')
+    else:
+        print(f"Form validation failed. Errors: {form.errors}")
+    
+    # get request 
+    return render_template('event_creation.html', form=form)
+
+
+@eventbp.route('/test-create', methods=['GET'])
+@login_required
+def test_create():
+    """Test route to manually create an event for debugging"""
+    try:
+        from .models import Event
+        from datetime import datetime, date, time
+        
+        # Create a simple test event
+        test_event = Event(
+            name="Test Event",
+            artist="Test Artist",
+            overview="Test overview",
+            location="Test Location",
+            description="Test description",
+            genres="Rock",
+            event_date=date(2025, 12, 25),
+            start_time=time(20, 0),
+            end_time=time(23, 0),
+            status="Open",
+            user_id=current_user.id
+        )
+        
+        db.session.add(test_event)
+        db.session.commit()
+        
+        return f"Test event created successfully! Event ID: {test_event.id}, User ID: {test_event.user_id}"
+        
+    except Exception as e:
+        return f"Error creating test event: {str(e)}"
+
+
+@eventbp.route('/migrate-ticket-status', methods=['GET'])
+@login_required
+def migrate_ticket_status():
+    """Migration route to add status column to tickets table and update existing tickets"""
+    try:
+        from .models import Ticket
+        from sqlalchemy import text
+        
+        # First, add the status column to the tickets table if it doesn't exist
+        try:
+            # Check if the column already exists
+            result = db.session.execute(text("PRAGMA table_info(tickets)"))
+            columns = [row[1] for row in result.fetchall()]
+            
+            if 'status' not in columns:
+                # Add the status column
+                db.session.execute(text("ALTER TABLE tickets ADD COLUMN status VARCHAR(20) DEFAULT 'Available'"))
+                print("Added status column to tickets table")
+            else:
+                print("Status column already exists in tickets table")
+                
+        except Exception as col_error:
+            print(f"Error adding column: {col_error}")
+            return f"Error adding status column: {str(col_error)}"
+        
+        # Now update existing tickets that might have NULL status
+        tickets = Ticket.query.filter(Ticket.status.is_(None)).all()
+        
+        if not tickets:
+            return "Migration completed! Status column added. No existing tickets needed updating."
+        
+        updated_count = 0
+        for ticket in tickets:
+            # Set status based on availability
+            if ticket.availability <= 0:
+                ticket.status = 'Unavailable'
+            else:
+                ticket.status = 'Available'
+            updated_count += 1
+        
+        db.session.commit()
+        
+        return f"Migration completed! Added status column and updated {updated_count} existing tickets."
+        
+    except Exception as e:
+        db.session.rollback()
+        return f"Migration failed: {str(e)}"
+
+
+@eventbp.route('/add-status-column', methods=['GET'])
+def add_status_column():
+    """Simple route to add status column to tickets table"""
+    try:
+        from sqlalchemy import text
+        
+        # Add the status column to the tickets table
+        db.session.execute(text("ALTER TABLE tickets ADD COLUMN status VARCHAR(20) DEFAULT 'Available'"))
+        db.session.commit()
+        
+        return "Status column added successfully to tickets table!"
+        
+    except Exception as e:
+        db.session.rollback()
+        return f"Error adding status column: {str(e)}"
+
+
+
+
+@eventbp.route('/all', methods=['GET'])
+def all_events():
+    query = request.args.get('query', '')
+    sort_date = request.args.get('sort_date')
+    sort_alpha = request.args.get('sort_alpha')
+    category = request.args.get('category')
+    status = request.args.get('status')
+    
+    # Update all event statuses based on current date/time first
+    Event.update_all_statuses()
+    
+    events = Event.query
+
+    # search query
+    if query:
+        events = events.filter(Event.name.ilike(f"%{query}%"))
+
+    # genre filter
+    if category:
+        events = events.filter(Event.genres.ilike(f"%{category}%"))
+
+    # Status filter
+    if status:
+        events = events.filter(Event.status.ilike(f"%{status}%"))
+    else:
+        # By default, only show active events (Open, Sold Out) - exclude Inactive and Cancelled
+        events = events.filter(Event.status.in_(['Open', 'Sold Out']))
+
+    # sorting options
+    if sort_date == "newest":
+        events = events.order_by(Event.event_date.desc())
+    elif sort_date == "oldest":
+        events = events.order_by(Event.event_date.asc())
+    elif sort_alpha == "az":
+        events = events.order_by(Event.name.asc())
+    elif sort_alpha == "za":
+        events = events.order_by(Event.name.desc())
+
+    events = events.all()
+
+    return render_template('all_events.html', events=events, query=query)
+
+
 @eventbp.route('/<int:event_id>/add_ticket', methods=['POST'])
+@login_required
 def add_ticket(event_id):
     """Add a ticket to an event"""
     event = Event.query.get_or_404(event_id)
@@ -361,17 +509,21 @@ def add_ticket(event_id):
 
 @eventbp.route('/<int:id>/add_comment', methods=['POST'])
 @login_required
-def add_comment(event_id):
+def add_comment(id):
     """Add a comment to an event"""
     event = Event.query.get_or_404(id)
     form = CommentForm()
     
     if form.validate_on_submit():
         try:
+            # Automatically set author to current user's name
+            author_name = f"{current_user.first_name} {current_user.surname}"
+            
             comment = Comment(
                 text=form.text.data,
-                author=form.author.data,
-                event_id=event_id 
+                author=author_name,
+                event_id=id,
+                created_at=datetime.now()  # Use local time
             )
             
             db.session.add(comment)
@@ -382,13 +534,21 @@ def add_comment(event_id):
             db.session.rollback()
             flash(f'Error adding comment: {str(e)}', 'error')
     
+    return redirect(url_for('events.show', id=id))
 
-    return redirect(url_for('events.show', id=event_id))
+
 
 @eventbp.route('/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit(id):
     """Edit an existing event"""
     event = Event.query.get_or_404(id)
+    
+    # Check if the current user owns this event
+    if event.user_id != current_user.id:
+        flash('You can only edit events that you created.', 'danger')
+        return redirect(url_for('main.edit_events'))
+    
     form = EventForm()
     
     print(f"Request method: {request.method}")
@@ -517,9 +677,15 @@ def edit(id):
     return render_template('edit_event.html', form=form, event=event)
 
 @eventbp.route('/tickets/<int:ticket_id>/edit', methods=['POST'])
+@login_required
 def edit_ticket(ticket_id):
     """Edit an existing ticket"""
     ticket = Ticket.query.get_or_404(ticket_id)
+    
+    # Check if the current user owns the event this ticket belongs to
+    if ticket.event.user_id != current_user.id:
+        flash('You can only edit tickets for events that you created.', 'danger')
+        return redirect(url_for('main.edit_events'))
     
     try:
         # Update ticket fields
@@ -527,10 +693,9 @@ def edit_ticket(ticket_id):
         ticket.price = float(request.form.get('price'))
         ticket.availability = int(request.form.get('availability'))
         ticket.description = request.form.get('description')
-        status = request.form.get('status', 'Available')
         
-        # Auto-update ticket status based on availability (override manual selection)
-        ticket.status = 'Sold Out' if ticket.availability == 0 else status
+        # Auto-update ticket status based on availability
+        ticket.update_status()
         
         # Update event status based on all tickets
         update_event_status_based_on_tickets(ticket.event)
@@ -545,9 +710,16 @@ def edit_ticket(ticket_id):
     return redirect(url_for('events.edit', id=ticket.event_id))
 
 @eventbp.route('/tickets/<int:ticket_id>/delete', methods=['GET'])
+@login_required
 def delete_ticket(ticket_id):
     """Delete a ticket"""
     ticket = Ticket.query.get_or_404(ticket_id)
+    
+    # Check if the current user owns the event this ticket belongs to
+    if ticket.event.user_id != current_user.id:
+        flash('You can only delete tickets for events that you created.', 'danger')
+        return redirect(url_for('main.edit_events'))
+    
     event_id = ticket.event_id
     
     try:
@@ -566,6 +738,15 @@ def delete_ticket(ticket_id):
     
     return redirect(url_for('events.edit', id=event_id))
 
+
+
+
+
+
+
+
+
+# ------------------------------------------------------------------
 # Legacy destination routes for backward compatibility
 destbp = Blueprint('destination', __name__, url_prefix='/destinations')
 
@@ -601,4 +782,3 @@ def get_destination():
     comment = Comment("Sally", "free face masks!", '2023-08-12 11:00:00')
     destination.set_comments(comment)
     return destination
-

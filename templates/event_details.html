@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -13,123 +12,150 @@
         </ol>
     </nav> -->
 
-            <!-- Shows all concert information previously inputted by the creator -->
-    <div class="container pt-5 pb-5">
-        {% if event.image %}
-            <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
-        {% else %}
-            <img class="card-img-top" src="{{ url_for('static', filename='img/gorillaz.jpg') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
-        {% endif %}
-    </div>
-    <div id="event_detail" class="container">
-        {% if event.status == 'Open' %}
-            <span class="badge text-bg-success mb-2">{{ event.status }}</span>
-        {% elif event.status == 'Sold Out' %}
-            <span class="badge text-bg-warning mb-2">{{ event.status }}</span>
-        {% elif event.status == 'Cancelled' %}
-            <span class="badge text-bg-danger mb-2">{{ event.status }}</span>
-        {% else %}
-            <span class="badge text-bg-secondary mb-2">{{ event.status }}</span>
-        {% endif %}
-        <h1 class="p-5"><strong>{{ event.name }}</strong></h1>
+        <!-- Shows all concert information previously inputted by the creator -->
 
-        
-        <h5 id="special" class="p-2">By {{ event.artist }}</h5>
-        <p>{{ event.overview }}</p>
-        <h3>Genre</h3>
-        <p>{{ event.genres }}</p>
-        <h3>Date and Time</h3>
-        <p>{{ event.event_date.strftime('%A, %d %B %Y') }}  {{ event.start_time.strftime('%I:%M %p') }}</p>
-        <p>{{ event.start_time.strftime('%I:%M %p') }} - {{ event.end_time.strftime('%I:%M %p') }}</p>
-         <!-- iframe allows for google maps to show the inputted location -->
-        <h3>Location</h3>
-        <p>{{ event.location }}</p>
-        <iframe src="https://maps.google.com/maps?q={{ event.location|urlencode }}&t=&z=13&ie=UTF8&iwloc=&output=embed" height="450" style="border:0;" class="container rounded mx-auto d-block" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="container mt-5 pt-5">
 
-        <h3>About</h3>
-        <strong id="special">{{ event.artist }}</strong>
-        <p>{{ event.description }}</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('events.list_all') }}">Events</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ event.name }}</li>
+            </ol>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Shows all concert information previously inputted by the creator -->
+        <div class="container pt-5 pb-5">
+            {% if event.image %}
+                <img class="card-img-top" src="{{ url_for('static', filename='uploads/' + event.image) }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
+            {% else %}
+                <img class="card-img-top" src="{{ url_for('static', filename='img/gorillaz.jpg') }}" alt="{{ event.name }}" style="max-height: 400px; object-fit: cover;">
+            {% endif %}
+        </div>
+        <div id="event_detail" class="container">
+            {% if event.status == 'Open' %}
+                <span class="badge text-bg-success mb-2">{{ event.status }}</span>
+            {% elif event.status == 'Sold Out' %}
+                <span class="badge text-bg-warning mb-2">{{ event.status }}</span>
+            {% elif event.status == 'Cancelled' %}
+                <span class="badge text-bg-danger mb-2">{{ event.status }}</span>
+            {% else %}
+                <span class="badge text-bg-secondary mb-2">{{ event.status }}</span>
+            {% endif %}
+            <h1 class="p-5"><strong>{{ event.name }}</strong></h1>
     
-        <h3 id="tickets">Tickets</h3>
-    </div>
-
-    <!-- Allows for users to select and buy tickets.
-     It includes information on the tickets, an information button popover, and allows the user to select the amount of tickets they want,
-     0 is entered by default as to ensure users don't accidently purchase multiple tickets.
-     If all fields arent entered a warning message will pop up -->
-    <div class="container">
-        <div class="border p-5 m-4">
-            {% if event.tickets %}
-                {% for ticket in event.tickets %}
-                <div id="ticket_purchase" class="border row p-3 m-4">
-                    <div class="col-md-2 mt-2">
-                        <strong>{{ ticket.name }}</strong>
-                        <p>${{ "%.2f"|format(ticket.price) }} each</p>
-                        <small class="text-muted">{{ ticket.availability }} available</small>
+            
+            <h5 id="special" class="p-2">By {{ event.artist }}</h5>
+            <p>{{ event.overview }}</p>
+            <h3>Genre</h3>
+            <p>{{ event.genres }}</p>
+            <h3>Date and Time</h3>
+            <p>{{ event.event_date.strftime('%A, %d %B %Y') }}  {{ event.start_time.strftime('%I:%M %p') }}</p>
+            <p>{{ event.start_time.strftime('%I:%M %p') }} - {{ event.end_time.strftime('%I:%M %p') }}</p>
+             <!-- iframe allows for google maps to show the inputted location -->
+            <h3>Location</h3>
+            <p>{{ event.location }}</p>
+            <iframe src="https://maps.google.com/maps?q={{ event.location|urlencode }}&t=&z=13&ie=UTF8&iwloc=&output=embed" height="450" style="border:0;" class="container rounded mx-auto d-block" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    
+            <h3>About</h3>
+            <strong id="special">{{ event.artist }}</strong>
+            <p>{{ event.description }}</p>
+        
+            <h3 id="tickets">Tickets</h3>
+        </div>
+    
+        <!-- Allows for users to select and buy tickets.
+         It includes information on the tickets, an information button popover, and allows the user to select the amount of tickets they want,
+         0 is entered by default as to ensure users don't accidently purchase multiple tickets.
+         If all fields arent entered a warning message will pop up -->
+        <div class="container">
+            <div class="border p-5 m-4">
+                {% if event.tickets %}
+                    {% for ticket in event.tickets %}
+                    <div id="ticket_purchase" class="border row p-3 m-4">
+                        <div class="col-md-2 mt-2">
+                            <strong>{{ ticket.name }}</strong>
+                            <p>${{ "%.2f"|format(ticket.price) }} each</p>
+                            <small class="text-muted">{{ ticket.availability }} available</small>
+                        </div>
+                        <div class="col-md-4 mt-3 mb-3">
+                            <button data-toggle="popover" class="btn btn-primary" title="{{ ticket.description }}">?</button>
+                        </div>
+                        <div class="col-md-2 offset-md-4 form-floating">
+                            <input type="number" class="form-control" id="ticket_{{ ticket.id }}" placeholder="" value="0" min="0" max="{{ ticket.availability }}">
+                            <label for="ticket_{{ ticket.id }}">Quantity</label>
+                        </div>
                     </div>
-                    <div class="col-md-4 mt-3 mb-3">
-                        <button data-toggle="popover" class="btn btn-primary" title="{{ ticket.description }}">?</button>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-4">
+                        <p class="text-muted">No tickets available for this event.</p>
                     </div>
-                    <div class="col-md-2 offset-md-4 form-floating">
-                        <input type="number" class="form-control" id="ticket_{{ ticket.id }}" placeholder="" value="0" min="0" max="{{ ticket.availability }}">
-                        <label for="ticket_{{ ticket.id }}">Quantity</label>
-                    </div>
+                {% endif %}
+                <!-- Once fully integrated, this button will lead the user to an additional purchase page to complete their transaction -->
+                <div id="get_tickets" class="d-grid gap-2">
+                    <a href="#tickets" class="btn btn-primary p-2">Checkout</a>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Displays comments left by previous users and allows for a logged in user to submit their own comment on the concert -->
+        <div id="event_detail" class="container">
+            <h3 id="comments">Comments</h3>
+            <form method="POST" action="{{ url_for('events.add_comment', id=event.id) }}">
+                {{ comment_form.hidden_tag() }}
+                <div class="input-group input-group-lg mb-3">
+                    {{ comment_form.text(class="form-control", placeholder="Leave a comment", aria_label="Leave a comment", aria_describedby="button-addon2") }}
+                    {{ comment_form.submit(class="btn btn-outline-primary", id="button-addon2") }}
+                </div>
+                <!-- Author field is now hidden and auto-populated -->
+                {{ comment_form.author(type="hidden") }}
+            </form>
+            
+            {% if event.comments %}
+                {% for comment in event.comments %}
+                <div class="border p-5 m-4">
+                    <h6 id="special">by {{ comment.author }}</h6>
+                    <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                    <p>{{ comment.text }}</p>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="text-center p-4">
-                    <p class="text-muted">No tickets available for this event.</p>
+                    <p class="text-muted">No comments yet. Be the first to comment!</p>
                 </div>
             {% endif %}
-            <!-- Once fully integrated, this button will lead the user to an additional purchase page to complete their transaction -->
-            <div id="get_tickets" class="d-grid gap-2">
-                <a href="#tickets" class="btn btn-primary p-2">Checkout</a>
-            </div>
+            
+            {% if event.comments|length > 3 %}
+            <button href="#comments" type="button" class="d-block mx-auto p-2 btn btn-link">View More Comments</button>
+            {% endif %}
         </div>
-    </div>
-
-    <!-- Displays comments left by previous users and allows for a logged in user to submit their own comment on the concert -->
-    <div id="event_detail" class="container">
-        <h3 id="comments">Comments</h3>
-        <form method="POST" action="{{ url_for('events.add_comment', event_id=event.id) }}">
-            {{ comment_form.hidden_tag() }}
-            <div class="input-group input-group-lg mb-3">
-                {{ comment_form.text(class="form-control", placeholder="Leave a comment", aria_label="Leave a comment", aria_describedby="button-addon2") }}
-                {{ comment_form.submit(class="btn btn-outline-primary", id="button-addon2") }}
-            </div>
-            <div class="input-group mb-3">
-                {{ comment_form.author(class="form-control", placeholder="Your name") }}
-            </div>
-        </form>
-        
-        {% if event.comments %}
-            {% for comment in event.comments %}
-            <div class="border p-5 m-4">
-                <h6 id="special">by {{ comment.author }}</h6>
-                <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
-                <p>{{ comment.text }}</p>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="text-center p-4">
-                <p class="text-muted">No comments yet. Be the first to comment!</p>
-            </div>
-        {% endif %}
-        
-        {% if event.comments|length > 3 %}
-        <button href="#comments" type="button" class="d-block mx-auto p-2 btn btn-link">View More Comments</button>
-        {% endif %}
-    </div>
 
     <!-- fixed to the bottom of the screen to allow users to easily make their way to purchasing tickets -->
-    <div id="get_tickets" class="d-grid gap-2">
+    </div> <div id="get_tickets" class="d-grid gap-2" style="z-index: 1000;">
         <a href="#tickets" class="btn btn-primary fixed-bottom p-2">Get Tickets</a>
     </div>
 
     <!-- Allows for the popover effect to display -->
     <script>
-        $(function () {
-            $('[data-toggle="popover"]').popover()
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+          return new bootstrap.Popover(popoverTriggerEl)
         })
     </script>
 

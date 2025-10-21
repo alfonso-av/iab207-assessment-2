@@ -56,39 +56,45 @@
       </div>
     
     <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
-      <!-- Each individual concert will get their own card as to have a short summary on what the concert is as it details a concert image, the status, date, time, location, and a short description -->
       <div id='card_image' class="row">
-        {% for event in events %}
-        <div class="col-lg-4 d-flex">
-          <div class="card m-3">
-            {% if event.image %}
-              <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
-            {% else %}
-              <img src="static/img/logo.png" class="card-img-top" alt="{{ event.name }}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ event.name }}</h5>
-              {% if event.status == 'Open' %}
-                <span class="badge text-bg-success mb-2 p-2">{{ event.status }}</span>
-              {% elif event.status == 'Sold Out' %}
-                <span class="badge text-bg-warning mb-2 p-2">{{ event.status }}</span>
-              {% elif event.status == 'Cancelled' %}
-                <span class="badge text-bg-danger mb-2 p-2">{{ event.status }}</span>
+        {% if events %}
+          {% for event in events %}
+          <div class="col-lg-4 d-flex">
+            <div class="card m-3">
+              {% if event.image %}
+                <img src="/static/uploads/{{ event.image }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;" onerror="this.src='/static/img/gorillaz.jpg'">
               {% else %}
-                <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+                <img src="/static/img/gorillaz.jpg" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
               {% endif %}
-              <p class="card-text">{{ event.location }} - {{ event.event_date.strftime('%dth %B') }} {{ event.start_time.strftime('%I:%M %p') }}</p>
-              <p class="card-text">{{ event.overview[:150] }}{% if event.overview|length > 150 %}...{% endif %}</p>
-              <div class="d-grid gap-2 mt-auto">
-                <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-primary align-self-end">Get Tickets</a>
+              <div class="card-body">
+                <h5 class="card-title">{{ event.name }}</h5>
+                {% if event.status == 'Open' %}
+                  <span class="badge text-bg-success mb-2 p-2">{{ event.status }}</span>
+                {% elif event.status == 'Sold Out' %}
+                  <span class="badge text-bg-warning mb-2 p-2">{{ event.status }}</span>
+                {% elif event.status == 'Cancelled' %}
+                  <span class="badge text-bg-danger mb-2 p-2">{{ event.status }}</span>
+                {% else %}
+                  <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+                {% endif %}
+                <p class="card-text"><strong>By:</strong> {{ event.artist }}</p>
+                <p class="card-text"><strong>Date:</strong> {{ event.event_date.strftime('%B %d, %Y') }}</p>
+                <p class="card-text"><strong>Time:</strong> {{ event.start_time.strftime('%I:%M %p') }} - {{ event.end_time.strftime('%I:%M %p') }}</p>
+                <p class="card-text"><strong>Location:</strong> {{ event.location }}</p>
+                <p class="card-text">{{ event.overview }}</p>
+                <div class="d-grid gap-2 mt-auto">
+                  <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-primary">View Details</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    
+          {% endfor %}
+        {% else %}
+          <div class="col-12 text-center py-5">
+            <h3 class="text-muted">No upcoming events found</h3>
+            <p class="text-muted">Check back later for new events!</p>
+          </div>
+        {% endif %}
 
 
     <!-- This section lets the user input a genre so they can later on see all of the concerts that are in that genre-->
@@ -120,5 +126,5 @@
 
     </div>
 
-{% endblock %}
 
+{% endblock %}
