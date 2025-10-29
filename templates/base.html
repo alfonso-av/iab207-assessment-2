@@ -12,7 +12,7 @@
 
 
     <body>
-    <!-- Adds navbar to the top of the page, it can lead you to further pages through the buttons-->
+    <!-- navbar -->
     <nav id="navs" class="navbar navbar-expand-lg fixed-top">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">
@@ -25,10 +25,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="{{ url_for('events.list_all') }}">Events</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item"> -->
               <a class="nav-link active" aria-current="page" href="{{ url_for('events.create') }}">Create Event</a>
             </li>
             <li class="nav-item">
@@ -41,7 +41,7 @@
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Genres
               </a>
-                <!-- The home page features a genre tab as to gain quick access to these options-->
+                <!-- Genre dropdown buttons -->
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" onclick="filterByGenre('Pop')">Pop</a></li>
                 <li><a class="dropdown-item" href="#" onclick="filterByGenre('Punk')">Punk</a></li>
@@ -63,10 +63,11 @@
               {% endif %}
             </li>
           </ul>
-          <form class="d-flex" role="search" action="{{ url_for('events.search') }}" method="get">
+          <form class="d-flex" role="search" action="{{ url_for('main.search') }}" method="get" onsubmit="sessionStorage.setItem('shouldScroll', 'true')">
             <input class="form-control me-3" name="q" type="search" placeholder="Search events..." aria-label="Search" value="{{ request.args.get('q', '') }}"/>
             <button class="btn btn-outline-secondary" type="submit">Search</button>
           </form>
+
         </div>
       </div>
     </nav>
@@ -76,13 +77,18 @@
         {% endblock %}
 
       <script>
+        // handles genre click
         function filterByGenre(genre) {
-          const baseUrl = "{{ url_for('events.all_events') }}";
-          // Build the URL to behave exactly like the filter form
+          // set flag so index.html scrolls down automatically
+          sessionStorage.setItem("shouldScroll", "true");
+
+          // Build the URL exactly like the filter form on index.html
+          const baseUrl = "{{ url_for('main.index') }}";
           const targetUrl = `${baseUrl}?sort_date=&category=${encodeURIComponent(genre)}&status=`;
           window.location.href = targetUrl;
         }
       </script>
+
 
     </body>
 
