@@ -7,9 +7,9 @@
   <!-- Carousel -->
   <div id="carouselExampleIndicators" class="container carousel slide">
     <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
     </div>
     <div id="carousel" class="carousel-inner rounded-5">
       <div class="carousel-item active">
@@ -36,11 +36,11 @@
     </div>
 
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="carousel-control-prev-icon"></span>
       <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="carousel-control-next-icon"></span>
       <span class="visually-hidden">Next</span>
     </button>
   </div>
@@ -49,16 +49,10 @@
   <div class="container mt-5 p-0">
     <h1 class="text-center">Upcoming Events</h1>
 
-    <div class="container mt-5 p-0">
-      <ul class="d-grid gap-2 d-md-flex justify-content-md-end p-3">
-        <p><a class="link-opacity-50-hover" href="{{ url_for('events.all_events') }}">See all events..</a></p>
-      </ul>
-    </div>
-
     <div id="card_image" class="row justify-content-center">
-      {% set open_events = events | selectattr('status', 'equalto', 'Open') | list %}
-      {% for event in open_events[:3] %}
+      {% for event in open_events %}
       <div class="col-lg-4 d-flex">
+        <!-- Each card links to its own event page -->
         <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
           <div class="card m-3 w-100 clickable-card shadow-sm">
             {% if event.image %}
@@ -70,31 +64,29 @@
             <div class="card-body">
               <h5 class="card-title">{{ event.name }}</h5>
 
-              <!-- Status badge -->
-              <span class="badge text-bg-success mb-2 p-2">{{ event.status }}</span>
+              <!-- Show different badge colours depending on event status -->
+              {% set status = event.status.lower() %}
+              {% if status == 'open' %}
+                <span class="badge text-bg-success mb-2 p-2">Open</span>
+              {% elif status == 'sold out' %}
+                <span class="badge text-bg-danger mb-2 p-2">Sold Out</span>
+              {% elif status == 'cancelled' %}
+                <span class="badge text-bg-warning mb-2 p-2">Cancelled</span>
+              {% elif status == 'inactive' %}
+                <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+              {% else %}
+                <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+              {% endif %}
 
-              <!-- Location, Date, Time -->
-              <p class="card-text mb-1">
-                <strong>Location:</strong> {{ event.location }}
-              </p>
-              <p class="card-text mb-1">
-                <strong>Date:</strong>
-                {% if event.event_date %}
-                  {{ event.event_date.strftime('%d %B %Y') }}
-                {% endif %}
-              </p>
+              <p class="card-text mb-1"><strong>Location:</strong> {{ event.location }}</p>
+              <p class="card-text mb-1"><strong>Date:</strong> {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}</p>
               <p class="card-text mb-2">
                 <strong>Time:</strong>
-                {% if event.start_time %}
-                  {{ event.start_time.strftime('%I:%M %p')|lower }}
-                {% endif %}
-                –
-                {% if event.end_time %}
-                  {{ event.end_time.strftime('%I:%M %p')|lower }}
-                {% endif %}
+                {% if event.start_time %}{{ event.start_time.strftime('%I:%M %p')|lower }}{% endif %} –
+                {% if event.end_time %}{{ event.end_time.strftime('%I:%M %p')|lower }}{% endif %}
               </p>
 
-              <!-- Description -->
+              <!-- Short event description -->
               <p class="card-text mt-3" style="min-height: 90px;">
                 <strong>Description:</strong><br>
                 {% set desc = event.overview or event.description %}
@@ -106,20 +98,22 @@
               </p>
 
               <hr class="my-2">
+              <p class="card-text text-muted mb-1"><strong>Artist:</strong> {{ event.artist or 'Unknown' }}</p>
+              <p class="text-muted mb-1" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
 
-              <!-- Artist and other info -->
-              <p class="card-text text-muted mb-1">
-                <strong>Artist:</strong> {{ event.artist or 'Unknown' }}
-              </p>
-              <p class="text-muted mb-1" style="font-size: 0.9rem;">
-                <strong>Genre:</strong> {{ event.genres or 'Not specified' }}
-              </p>
-              <p class="text-muted mb-3" style="font-size: 0.9rem;">
-                <strong>Tickets:</strong> Tickets available
-                {% if event.tickets and event.tickets|length > 0 %}
-                  – from ${{ "%.2f"|format(event.tickets[0].price) }}
-                {% endif %}
-              </p>
+              <!-- Ticket info -->
+              {% set current_status = event.status.lower() %}
+              {% if current_status == 'open' %}
+                <p class="card-text mb-1"><strong>Tickets:</strong> Tickets available
+                  {% if event.tickets and event.tickets|length > 0 %}
+                    – from ${{ "%.2f"|format(event.tickets[0].price) }}
+                  {% endif %}
+                </p>
+              {% elif current_status in ['sold out', 'cancelled', 'inactive'] %}
+                <p class="card-text mb-1"><strong>Tickets:</strong> Tickets not available</p>
+              {% else %}
+                <p class="card-text mb-1"><strong>Tickets:</strong> Not specified</p>
+              {% endif %}
             </div>
           </div>
         </a>
@@ -128,43 +122,166 @@
     </div>
   </div>
 
-  <!-- Genre Search Section -->
-   <div class="container text-center">
-   <h1 class="p-5">Search by Genre</h1>
-   <div class="row" id="genre_buttons">
-      <button type="button" class="btn col-xs-6" onclick="filterByGenre('Pop')">Pop</button>
-      <button type="button" class="btn col-xs-6" onclick="filterByGenre('Punk')">Punk</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Rock')">Rock</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Jazz')">Jazz</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Metal')">Metal</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Hip Hop')">Hip-hop</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Country')">Country</button>
-      <button type="button" class="btn col-xs-12" onclick="filterByGenre('Electronic')">Electronic</button>
+  <!-- All Events Section -->
+  <div class="container-fluid mt-5 px-5" id="all-events">
+    <h1 class="text-center mb-4">All Events</h1>
+
+    <!-- Results summary -->
+    {% if total_results is defined %}
+      {% if total_results > 0 %}
+        <h5 class="text-center text-light mb-4">
+          Found ({{ total_results }}) {{ 'result' if total_results == 1 else 'results' }}
+          {% if q %}
+            matching “{{ q }}”
+          {% endif %}
+        </h5>
+      {% else %}
+        <h5 class="text-center text-light mb-4">
+          No events found
+          {% if q %}
+            matching “{{ q }}”
+          {% endif %}
+        </h5>
+      {% endif %}
+    {% endif %}
+
+    <!-- Filter Form -->
+    <!-- Handles date, genre, and status filters -->
+    <form method="GET" action="{{ url_for('main.index') }}" class="row mb-5 justify-content-center align-items-end g-3 text-light">
+      <div class="col-md-2">
+        <label for="sort_date" class="form-label mb-1">Date</label>
+        <select class="form-select" id="sort_date" name="sort_date">
+          <option value="">--</option>
+          <option value="newest" {% if request.args.get('sort_date') == 'newest' %}selected{% endif %}>Newest → Oldest</option>
+          <option value="oldest" {% if request.args.get('sort_date') == 'oldest' %}selected{% endif %}>Oldest → Newest</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="category" class="form-label mb-1">Genre</label>
+        <select class="form-select" id="category" name="category">
+          <option value="">--</option>
+          {% set genres = ['Pop', 'Punk', 'Rock', 'Jazz', 'Metal', 'Hip Hop', 'Country', 'Electronic'] %}
+          {% for genre in genres %}
+            <option value="{{ genre }}" {% if request.args.get('category') == genre %}selected{% endif %}>{{ genre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2">
+        <label for="status" class="form-label mb-1">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="">Show All</option>
+          {% set statuses = ['Open', 'Inactive', 'Cancelled', 'Sold Out'] %}
+          {% for s in statuses %}
+            <option value="{{ s }}" {% if request.args.get('status', 'Show All') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2 text-center">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+      </div>
+    </form>
+
+    <!-- All Events Cards -->
+    <div id="card_image" class="row justify-content-center">
+      {% if events %}
+        {% for event in events %}
+        <div class="col-lg-4 d-flex">
+          <!-- Each card links to an event’s details page -->
+          <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
+            <div class="card m-3 w-100 clickable-card shadow-sm">
+              {% if event.image %}
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
+              {% else %}
+                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
+              {% endif %}
+
+              <div class="card-body">
+                <h5 class="card-title">{{ event.name }}</h5>
+
+                {% set status = event.status.lower() %}
+                {% if status == 'open' %}
+                  <span class="badge text-bg-success mb-2 p-2">Open</span>
+                {% elif status == 'sold out' %}
+                  <span class="badge text-bg-danger mb-2 p-2">Sold Out</span>
+                {% elif status == 'cancelled' %}
+                  <span class="badge text-bg-warning mb-2 p-2">Cancelled</span>
+                {% elif status == 'inactive' %}
+                  <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+                {% else %}
+                  <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+                {% endif %}
+
+                <p class="card-text mb-1"><strong>Location:</strong> {{ event.location }}</p>
+                <p class="card-text mb-1"><strong>Date:</strong> {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}</p>
+                <p class="card-text mb-2">
+                  <strong>Time:</strong>
+                  {% if event.start_time %}{{ event.start_time.strftime('%I:%M %p')|lower }}{% endif %} –
+                  {% if event.end_time %}{{ event.end_time.strftime('%I:%M %p')|lower }}{% endif %}
+                </p>
+
+                <!-- Short description preview -->
+                <p class="card-text mt-3" style="min-height: 90px;">
+                  <strong>Description:</strong><br>
+                  {% set desc = event.overview or event.description %}
+                  {% if desc %}
+                    {{ desc[:100] }}{% if desc|length > 100 %}...{% endif %}
+                  {% else %}
+                    No description available.
+                  {% endif %}
+                </p>
+
+                <hr class="my-2">
+                <p class="card-text text-muted mb-1"><strong>Artist:</strong> {{ event.artist or 'Unknown' }}</p>
+                <p class="text-muted mb-1" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
+
+                <!-- Ticket info -->
+                {% set current_status = event.status.lower() %}
+                {% if current_status == 'open' %}
+                  <p class="card-text mb-1"><strong>Tickets:</strong> Tickets available
+                    {% if event.tickets and event.tickets|length > 0 %}
+                      – from ${{ "%.2f"|format(event.tickets[0].price) }}
+                    {% endif %}
+                  </p>
+                {% elif current_status in ['sold out', 'cancelled', 'inactive'] %}
+                  <p class="card-text mb-1"><strong>Tickets:</strong> Tickets not available</p>
+                {% else %}
+                  <p class="card-text mb-1"><strong>Tickets:</strong> Not specified</p>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-center text-muted">No events found.</p>
+      {% endif %}
     </div>
-
-    <script>
-      function filterByGenre(genre) {
-        const baseUrl = "{{ url_for('events.all_events') }}";
-        // build url identical to the filter form submission (just used the url when the filters actually get applied)
-        const targetUrl = `${baseUrl}?sort_date=&category=${encodeURIComponent(genre)}&status=`;
-        window.location.href = targetUrl;
-      }
-    </script>
-
-
-  <!-- <div class="container text-center">
-    <h1 class="p-5">Search by Genre</h1>
-    <div class="row" id="genre_buttons">
-      <button type="button" class="btn col-xs-6">Pop</button>
-      <button type="button" class="btn col-xs-6">Punk</button>
-      <button type="button" class="btn col-xs-12">Rock</button>
-      <button type="button" class="btn col-xs-12">Jazz</button>
-      <button type="button" class="btn col-xs-12">Metal</button>
-      <button type="button" class="btn col-xs-12">Hip-hop</button>
-      <button type="button" class="btn col-xs-12">Country</button>
-      <button type="button" class="btn col-xs-12">Electronic</button>
-    </div> -->
-
-    
   </div>
+
+  <!-- Keeps scroll position when filters/search are used -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (sessionStorage.getItem("shouldScroll") === "true") {
+        const allEvents = document.getElementById("all-events");
+        if (allEvents) {
+          setTimeout(() => {
+            allEvents.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 300);
+        }
+        sessionStorage.removeItem("shouldScroll");
+      }
+    });
+
+    // When a filter form is submitted, remember to scroll back down
+    document.addEventListener("submit", (e) => {
+      const action = e.target.getAttribute("action") || "";
+      if (action.includes("/index") || action === "/") {
+        sessionStorage.setItem("shouldScroll", "true");
+      }
+    });
+  </script>
+
 {% endblock %}
