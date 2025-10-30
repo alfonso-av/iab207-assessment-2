@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 pycache/
 
+travel/__pycache__
+instance/*
+
 __pycache__/
 *.pyc
 instance/*.db
