@@ -114,7 +114,7 @@ def process_booking(event_id):
         flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
         # flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
         
-        return redirect(url_for('bookings.history')) 
+        return redirect(url_for('events.edit', id=ticket.event_id)) 
 
     except Exception as e:
         db.session.rollback()
@@ -147,7 +147,7 @@ def cancel_booking(booking_id):
         # Delete the booking record
         db.session.delete(booking_to_cancel)
         db.session.commit()
-        flash(f'Booking #{booking_id} successfully cancelled.', 'success')
+        flash(f'Booking Successfully cancelled.', 'success')
         
     except Exception as e:
         db.session.rollback()
