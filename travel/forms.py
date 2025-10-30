@@ -50,12 +50,6 @@ class EventForm(FlaskForm):
     event_date = DateField('Event Date', validators=[InputRequired(), validate_event_date])
     start_time = TimeField('Start Time', validators=[InputRequired()])
     end_time = TimeField('End Time', validators=[InputRequired()])
-    status = SelectField('Event Status', choices=[
-        ('Open', 'Open'),
-        ('Sold Out', 'Sold Out'),
-        ('Cancelled', 'Cancelled')
-    ], default='Open', validators=[InputRequired()])
-    
     submit = SubmitField("Create Event")
 
 class TicketForm(FlaskForm):
