@@ -8,6 +8,15 @@ from .forms import EventForm, TicketForm, CommentForm, DestinationForm
 from flask_login import login_required, current_user
 from sqlalchemy import or_
 
+def format_form_errors(form):
+    """Helper function to format form validation errors into user-friendly messages"""
+    error_messages = []
+    for field, errors in form.errors.items():
+        for error in errors:
+            field_name = field.replace('_', ' ').title()
+            error_messages.append(f"{field_name}: {error}")
+    return error_messages
+
 # Use of blueprint to group routes, 
 # name - first argument is the blue print name 
 # import name - second argument - helps identify the root url for it 
@@ -86,7 +95,7 @@ def process_booking(event_id):
                     ticket.availability -= quantity 
                     
                     # Update ticket status based on new availability
-                    ticket.update_status()
+                    ticket.status = 'Sold Out' if ticket.availability <= 0 else 'Available'
                     
                     booking_price = quantity * ticket.price
                     
@@ -140,7 +149,7 @@ def cancel_booking(booking_id):
         ticket.availability += booking_to_cancel.quantity
         
         # Update ticket status based on new availability
-        ticket.update_status()
+        ticket.status = 'Sold Out' if ticket.availability <= 0 else 'Available'
         
         db.session.add(ticket)
         
@@ -262,7 +271,7 @@ def create():
                 event_date=form.event_date.data,
                 start_time=form.start_time.data,
                 end_time=form.end_time.data,
-                status=form.status.data,
+                status='Open',  # Always start as Open, status will be managed automatically
                 user_id=current_user.id  # Assign the current user as the event creator
             )
             
@@ -284,15 +293,13 @@ def create():
                     if ticket_names[i] and ticket_prices[i] and ticket_availabilities[i] and ticket_descriptions[i]:
                         availability = int(ticket_availabilities[i])
                         
-                        # Set initial ticket status based on availability
-                        ticket_status = 'Available' if availability > 0 else 'Sold Out'
-                        
                         ticket = Ticket(
                             name=ticket_names[i],
                             price=float(ticket_prices[i]),
-                            availability=int(ticket_availabilities[i]),
+                            availability=availability,
                             description=ticket_descriptions[i],
-                            event_id=event.id
+                            event_id=event.id,
+                            status='Sold Out' if availability <= 0 else 'Available'
                         )
                         db.session.add(ticket)
             
@@ -312,6 +319,14 @@ def create():
             print(f"Error creating event: {str(e)}")
             flash(f'Error creating event: {str(e)}', 'error')
     else:
+        # Show specific validation errors to the user
+        error_messages = format_form_errors(form)
+        
+        if error_messages:
+            flash('; '.join(error_messages), 'danger')
+        else:
+            flash('Form validation failed. Please check the fields.', 'danger')
+        
         print(f"Form validation failed. Errors: {form.errors}")
     
     # get request 
@@ -417,6 +432,33 @@ def add_status_column():
         db.session.rollback()
         return f"Error adding status column: {str(e)}"
 
+@eventbp.route('/migrate-ticket-statuses', methods=['GET'])
+def migrate_ticket_statuses():
+    """Migrate existing tickets to have proper status based on availability"""
+    try:
+        from .models import Ticket
+        
+        # Get all tickets that don't have a status or have null status
+        tickets = Ticket.query.filter(
+            (Ticket.status.is_(None)) | (Ticket.status == '')
+        ).all()
+        
+        updated_count = 0
+        for ticket in tickets:
+            if ticket.availability <= 0:
+                ticket.status = 'Sold Out'
+            else:
+                ticket.status = 'Available'
+            updated_count += 1
+        
+        db.session.commit()
+        
+        return f"Migration completed! Updated {updated_count} tickets with proper status."
+        
+    except Exception as e:
+        db.session.rollback()
+        return f"Migration failed: {str(e)}"
+
 
 
 
@@ -466,27 +508,59 @@ def all_events():
 def add_ticket(event_id):
     """Add a ticket to an event"""
     event = Event.query.get_or_404(event_id)
-    form = TicketForm()
     
-    if form.validate_on_submit():
-        try:
-            ticket = Ticket(
-                name=form.name.data,
-                price=form.price.data,
-                availability=form.availability.data,
-                description=form.description.data,
-                event_id=event_id
-            )
-            
-            db.session.add(ticket)
-            db.session.commit()
-            
-            flash('Ticket added successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error adding ticket: {str(e)}', 'error')
+    # Check if the current user owns this event
+    if event.user_id != current_user.id:
+        flash('You can only add tickets to events that you created.', 'danger')
+        return redirect(url_for('events.show', id=event_id))
     
-    return redirect(url_for('events.show', id=event_id))
+    try:
+        # Get form data directly from request
+        name = request.form.get('name')
+        price = float(request.form.get('price'))
+        availability = int(request.form.get('availability'))
+        description = request.form.get('description')
+        
+        # Validate required fields
+        if not name or not description:
+            flash('Ticket name and description are required.', 'error')
+            return redirect(url_for('events.edit', id=event_id))
+        
+        if price < 0:
+            flash('Price must be positive.', 'error')
+            return redirect(url_for('events.edit', id=event_id))
+        
+        if availability < 0:
+            flash('Availability must be non-negative.', 'error')
+            return redirect(url_for('events.edit', id=event_id))
+        
+        # Create ticket
+        ticket = Ticket(
+            name=name,
+            price=price,
+            availability=availability,
+            description=description,
+            event_id=event_id,
+            status='Sold Out' if availability <= 0 else 'Available'
+        )
+        
+        db.session.add(ticket)
+        
+        # Update event status based on all tickets
+        update_event_status_based_on_tickets(event)
+        
+        db.session.commit()
+        
+        flash('Ticket added successfully!', 'success')
+        
+    except ValueError as e:
+        db.session.rollback()
+        flash('Invalid input. Please check your values.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error adding ticket: {str(e)}', 'error')
+    
+    return redirect(url_for('events.edit', id=event_id))
 
 
 @eventbp.route('/<int:id>/add_comment', methods=['POST'])
@@ -545,7 +619,7 @@ def edit(id):
         form.event_date.data = event.event_date
         form.start_time.data = event.start_time
         form.end_time.data = event.end_time
-        form.status.data = event.status
+        # Status is now read-only, no need to populate form.status.data
         form.genres.data = event.genres.split(',') if event.genres else []
         return render_template('edit_event.html', form=form, event=event)
 
@@ -589,18 +663,10 @@ def edit(id):
             event.start_time = form.start_time.data
             event.end_time = form.end_time.data
 
-            # ✅ Instead of deleting cancelled events, just mark them
-            if form.status.data == 'Cancelled':
-                event.status = 'Cancelled'
-                flash(f"The event '{event.name}' has been marked as Cancelled.", 'warning')
-            else:
-                event.status = form.status.data
-                flash(f"The event '{event.name}' has been successfully updated.", 'success')
-
-            # Auto-check if all tickets are sold out
-            total_availability = sum(ticket.availability for ticket in event.tickets)
-            if total_availability == 0 and event.tickets:
-                event.status = 'Sold Out'
+            # Status is now automatically managed, no manual status updates
+            # Update event status based on current conditions
+            event.update_status()
+            flash(f"The event '{event.name}' has been successfully updated.", 'success')
 
             db.session.commit()
             return redirect(url_for('events.show', id=event.id))
@@ -611,8 +677,16 @@ def edit(id):
             return redirect(url_for('events.edit', id=event.id))
 
     else:
-        flash('Form validation failed. Please check the fields.', 'danger')
-        print(form.errors)
+        # Show specific validation errors to the user
+        error_messages = format_form_errors(form)
+        
+        if error_messages:
+            flash('; '.join(error_messages), 'danger')
+        else:
+            flash('Form validation failed. Please check the fields.', 'danger')
+        
+        print(f"Form validation errors: {form.errors}")
+        print(f"Form data: {form.data}")
         return render_template('edit_event.html', form=form, event=event)
 
 
@@ -631,11 +705,12 @@ def edit_ticket(ticket_id):
         # Update ticket fields
         ticket.name = request.form.get('name')
         ticket.price = float(request.form.get('price'))
-        ticket.availability = int(request.form.get('availability'))
+        new_availability = int(request.form.get('availability'))
+        ticket.availability = new_availability
         ticket.description = request.form.get('description')
         
         # Auto-update ticket status based on availability
-        ticket.update_status()
+        ticket.status = 'Sold Out' if new_availability <= 0 else 'Available'
         
         # Update event status based on all tickets
         update_event_status_based_on_tickets(ticket.event)
@@ -677,6 +752,46 @@ def delete_ticket(ticket_id):
         flash(f'Error deleting ticket: {str(e)}', 'error')
     
     return redirect(url_for('events.edit', id=event_id))
+
+@eventbp.route('/<int:id>/cancel', methods=['POST'])
+@login_required
+def cancel_event(id):
+    """Cancel/Delete an event permanently"""
+    event = Event.query.get_or_404(id)
+    
+    # Check if the current user owns this event
+    if event.user_id != current_user.id:
+        flash('You can only cancel events that you created.', 'danger')
+        return redirect(url_for('main.edit_events'))
+    
+    try:
+        # Delete all associated bookings first
+        bookings = Booking.query.filter_by(event_id=id).all()
+        for booking in bookings:
+            db.session.delete(booking)
+        
+        # Delete all associated tickets
+        tickets = Ticket.query.filter_by(event_id=id).all()
+        for ticket in tickets:
+            db.session.delete(ticket)
+        
+        # Delete all associated comments
+        comments = Comment.query.filter_by(event_id=id).all()
+        for comment in comments:
+            db.session.delete(comment)
+        
+        # Finally delete the event
+        event_name = event.name
+        db.session.delete(event)
+        db.session.commit()
+        
+        flash(f'Event "{event_name}" has been permanently cancelled and deleted.', 'success')
+        return redirect(url_for('main.edit_events'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error cancelling event: {str(e)}', 'danger')
+        return redirect(url_for('events.edit', id=id))
 
 
 

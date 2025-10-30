@@ -108,26 +108,20 @@
             </div>
         </div>
         
-        <!-- Event Status -->
+        <!-- Event Status (Read-only) -->
         <h5>Event Status</h5>
         <div class="form-floating mb-3">
-            {{ form.status(class="form-select", id="floatingSelect") }}
-            <label for="floatingSelect">Select Event Status</label>
+            <input type="text" class="form-control" id="floatingStatus" value="{{ event.dynamic_status }}" readonly>
+            <label for="floatingStatus">Current Event Status</label>
         </div>
         
-        <!-- Warning for Cancelled status -->
-        <!-- <div class="alert alert-warning" role="alert">
-            <strong>Warning:</strong> Setting status to "Cancelled" will permanently delete this event and all its tickets and comments.
-        </div> -->
-        <!-- Updated warning -->
-        <div class="alert alert-warning" role="alert">
-            <strong>Note:</strong> Setting status to "Cancelled" will keep the event visible but mark it as cancelled.
-        </div>
+        
 
 
         <!-- Submit Button -->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end p-3">
             <a href="{{ url_for('events.show', id=event.id) }}" class="btn btn-secondary btn-lg me-2">Cancel</a>
+            <button type="button" class="btn btn-danger btn-lg me-2" data-bs-toggle="modal" data-bs-target="#cancelEventModal">Cancel Event</button>
             {{ form.submit(class="btn btn-success btn-lg", value="Update Event") }}
         </div>
     </form>
@@ -159,10 +153,8 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Status</label>
-                            <select class="form-select" name="status" required>
-                                <option value="Available" {% if ticket.status == 'Available' %}selected{% endif %}>Available</option>
-                                <option value="Sold Out" {% if ticket.status == 'Sold Out' %}selected{% endif %}>Sold Out</option>
-                            </select>
+                            <input type="text" class="form-control" value="{{ ticket.status }}" readonly>
+                            <small class="text-muted">Auto-managed based on availability</small>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2">Update</button>
@@ -205,10 +197,8 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Status</label>
-                            <select class="form-select" name="status" required>
-                                <option value="Available" selected>Available</option>
-                                <option value="Sold Out">Sold Out</option>
-                            </select>
+                            <input type="text" class="form-control" value="Available" readonly>
+                            <small class="text-muted">Auto-managed based on availability</small>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-success">Add Ticket</button>
@@ -219,5 +209,32 @@
         </div>
     </div>
 
+    <!-- Cancel Event Confirmation Modal -->
+    <div class="modal fade" id="cancelEventModal" tabindex="-1" aria-labelledby="cancelEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelEventModalLabel">Cancel Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Are you sure you want to cancel this event?</strong></p>
+                    <p>This action will:</p>
+                    <ul>
+                        <li>Permanently delete the event "{{ event.name }}"</li>
+                        <li>Delete all associated tickets and comments</li>
+                        <li>Cancel all existing bookings for this event</li>
+                    </ul>
+                    <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Event</button>
+                    <form method="POST" action="{{ url_for('events.cancel_event', id=event.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Yes, Cancel Event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% endblock %}
