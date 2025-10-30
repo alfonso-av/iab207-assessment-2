@@ -8,6 +8,9 @@ __pycache__/
 *.pyc
 instance/*.db
 
+
+travel/__pycache__/
+instance/*
 # C extensions
 *.so
 

@@ -134,6 +134,7 @@ class Ticket(db.Model):
     price = db.Column(db.Float, nullable=False)
     availability = db.Column(db.Integer, nullable=False) # The number of tickets remaining
     description = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Available', nullable=False)  # Available, Sold Out
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     
     def update_status(self):
@@ -142,6 +143,16 @@ class Ticket(db.Model):
             self.status = 'Sold Out'
         else:
             self.status = 'Available'
+    
+    def __setattr__(self, name, value):
+        """Override to automatically update status when availability changes"""
+        super().__setattr__(name, value)
+        if name == 'availability' and hasattr(self, 'status'):
+            # Update status when availability changes
+            if value <= 0:
+                self.status = 'Sold Out'
+            else:
+                self.status = 'Available'
     
     def __repr__(self):
         return f"Ticket: {self.name} - ${self.price} ({self.status})"
