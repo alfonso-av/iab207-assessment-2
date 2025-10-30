@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, abort, session
 from flask_login import login_required, current_user
+from datetime import datetime
 from .models import db, Booking, Event, Ticket 
 
 # Define the Blueprint
@@ -17,7 +18,7 @@ def history():
     user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.booked_at.desc()).all()
     
     # Renders the dynamic template
-    return render_template('bookings.html', bookings=user_bookings) 
+    return render_template('bookings.html', bookings=user_bookings, now=datetime.now) 
 
 
 @bookingsbp.route('/cancel/<int:booking_id>', methods=['POST'])
@@ -54,4 +55,5 @@ def cancel_booking(booking_id):
         flash("An error occurred during cancellation.", 'danger')
 
     # FIX: Redirect to the correct endpoint name: 'bookings.history'
+
     return redirect(url_for('bookings.history'))
