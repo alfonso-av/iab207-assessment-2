@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template, redirect, url_for, request, flash, session
+from flask import Blueprint,render_template, redirect, url_for, request, flash, session, abort
 from .forms import RegisterForm
 from . import db
 from .models import User
@@ -122,7 +122,7 @@ def about():
 def faq():
     return render_template("FAQ.html")
 
-@mainbp.errorhandler(404)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return render_template('profile.html'), 404
+# testing for error 500
+@mainbp.route('/force500')
+def force500():
+    abort(500)
