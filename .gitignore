@@ -6,7 +6,7 @@ pycache/
 
 __pycache__/
 *.pyc
-instance/*.db
+# instance/*.db
 
 
 travel/__pycache__/
