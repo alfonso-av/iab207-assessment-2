@@ -5,32 +5,33 @@
 <body id="homepage">
 
   <!-- Carousel -->
-  <div id="carouselExampleIndicators" class="container carousel slide">
+  <div id="carouselExampleIndicators" class="container carousel slide mt-4">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
     </div>
-    <div id="carousel" class="carousel-inner rounded-5">
+
+    <div id="carousel" class="carousel-inner rounded-4 shadow-sm">
       <div class="carousel-item active">
-        <img src="{{ url_for('static', filename='img/concert 2.gif') }}" class="d-block w-100" alt="Discover">
-        <div class="carousel-caption">
-          <h2>Discover</h2>
-          <p>Find upcoming local bands</p>
+        <img src="{{ url_for('static', filename='img/concert 2.gif') }}" class="d-block w-100" alt="Discover" style="object-fit: cover; max-height: 500px;">
+        <div class="carousel-caption bg-dark bg-opacity-50 rounded-3 p-3">
+          <h2 class="fw-bold text-white">Discover</h2>
+          <p class="text-light">Find upcoming local bands</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="{{ url_for('static', filename='img/concert 1.gif') }}" class="d-block w-100" alt="Create">
-        <div class="carousel-caption">
-          <h2>Create</h2>
-          <p>Host your own concert</p>
+        <img src="{{ url_for('static', filename='img/concert 1.gif') }}" class="d-block w-100" alt="Create" style="object-fit: cover; max-height: 500px;">
+        <div class="carousel-caption bg-dark bg-opacity-50 rounded-3 p-3">
+          <h2 class="fw-bold text-white">Create</h2>
+          <p class="text-light">Host your own concert</p>
         </div>
       </div>
       <div class="carousel-item">
-        <img src="{{ url_for('static', filename='img/concert 3.gif') }}" class="d-block w-100" alt="Variety">
-        <div class="carousel-caption">
-          <h2>Variety</h2>
-          <p>Enjoy browsing different genres</p>
+        <img src="{{ url_for('static', filename='img/concert 3.gif') }}" class="d-block w-100" alt="Variety" style="object-fit: cover; max-height: 500px;">
+        <div class="carousel-caption bg-dark bg-opacity-50 rounded-3 p-3">
+          <h2 class="fw-bold text-white">Variety</h2>
+          <p class="text-light">Enjoy browsing different genres</p>
         </div>
       </div>
     </div>
@@ -46,47 +47,46 @@
   </div>
 
   <!-- Upcoming Events Section -->
-  <div class="container mt-5 p-0">
-    <h1 class="text-center">Upcoming Events</h1>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4 fw-bold">Upcoming Events</h1>
 
     <div id="card_image" class="row justify-content-center">
       {% for event in open_events %}
       <div class="col-lg-4 d-flex">
-        <!-- Each card links to its own event page -->
         <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
-          <div class="card m-3 w-100 clickable-card shadow-sm">
+          <div class="card m-3 w-100 shadow-sm rounded-4 border-0">
             {% if event.image %}
-              <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
+              <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top rounded-top-4" alt="{{ event.name }}" style="object-fit: cover; max-height: 250px;">
             {% else %}
-              <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
+              <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top rounded-top-4" alt="Default Event" style="object-fit: cover; max-height: 250px;">
             {% endif %}
 
-            <div class="card-body">
-              <h5 class="card-title">{{ event.name }}</h5>
+            <div class="card-body p-4">
+              <h5 class="card-title mb-3">{{ event.name }}</h5>
 
-              <!-- Show different badge colours depending on event status -->
               {% set status = event.status.lower() %}
               {% if status == 'open' %}
-                <span class="badge text-bg-success mb-2 p-2">Open</span>
+                <span class="badge bg-success mb-3 px-3 py-2">Open</span>
               {% elif status == 'sold out' %}
-                <span class="badge text-bg-danger mb-2 p-2">Sold Out</span>
+                <span class="badge bg-danger mb-3 px-3 py-2">Sold Out</span>
               {% elif status == 'cancelled' %}
-                <span class="badge text-bg-warning mb-2 p-2">Cancelled</span>
+                <span class="badge bg-warning text-dark mb-3 px-3 py-2">Cancelled</span>
               {% elif status == 'inactive' %}
-                <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+                <span class="badge bg-secondary mb-3 px-3 py-2">Inactive</span>
               {% else %}
-                <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+                <span class="badge bg-secondary mb-3 px-3 py-2">{{ event.status }}</span>
               {% endif %}
 
-              <p class="card-text mb-1"><strong>Location:</strong> {{ event.location }}</p>
-              <p class="card-text mb-1"><strong>Date:</strong> {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}</p>
-              <p class="card-text mb-2">
+              <p class="card-text mb-2"><strong>Location:</strong> {{ event.location }}</p>
+              <p class="card-text mb-2"><strong>Date:</strong>
+                {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}
+              </p>
+              <p class="card-text mb-3">
                 <strong>Time:</strong>
                 {% if event.start_time %}{{ event.start_time.strftime('%I:%M %p')|lower }}{% endif %} –
                 {% if event.end_time %}{{ event.end_time.strftime('%I:%M %p')|lower }}{% endif %}
               </p>
 
-              <!-- Short event description -->
               <p class="card-text mt-3" style="min-height: 90px;">
                 <strong>Description:</strong><br>
                 {% set desc = event.overview or event.description %}
@@ -97,11 +97,10 @@
                 {% endif %}
               </p>
 
-              <hr class="my-2">
+              <hr class="my-3">
               <p class="card-text text-muted mb-1"><strong>Artist:</strong> {{ event.artist or 'Unknown' }}</p>
-              <p class="text-muted mb-1" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
+              <p class="text-muted mb-2" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
 
-              <!-- Ticket info -->
               {% set current_status = event.status.lower() %}
               {% if current_status == 'open' %}
                 <p class="card-text mb-1"><strong>Tickets:</strong> Tickets available
@@ -124,29 +123,22 @@
 
   <!-- All Events Section -->
   <div class="container-fluid mt-5 px-5" id="all-events">
-    <h1 class="text-center mb-4">All Events</h1>
+    <h1 class="text-center mb-4 fw-bold">All Events</h1>
 
-    <!-- Results summary -->
     {% if total_results is defined %}
       {% if total_results > 0 %}
         <h5 class="text-center text-light mb-4">
           Found ({{ total_results }}) {{ 'result' if total_results == 1 else 'results' }}
-          {% if q %}
-            matching “{{ q }}”
-          {% endif %}
+          {% if q %} matching “{{ q }}”{% endif %}
         </h5>
       {% else %}
         <h5 class="text-center text-light mb-4">
-          No events found
-          {% if q %}
-            matching “{{ q }}”
-          {% endif %}
+          No events found {% if q %} matching “{{ q }}”{% endif %}
         </h5>
       {% endif %}
     {% endif %}
 
     <!-- Filter Form -->
-    <!-- Handles date, genre, and status filters -->
     <form method="GET" action="{{ url_for('main.index') }}" class="row mb-5 justify-content-center align-items-end g-3 text-light">
       <div class="col-md-2">
         <label for="sort_date" class="form-label mb-1">Date</label>
@@ -189,41 +181,41 @@
       {% if events %}
         {% for event in events %}
         <div class="col-lg-4 d-flex">
-          <!-- Each card links to an event’s details page -->
           <a href="{{ url_for('events.show', id=event.id) }}" class="card-link-wrapper text-decoration-none text-dark w-100">
-            <div class="card m-3 w-100 clickable-card shadow-sm">
+            <div class="card m-3 w-100 shadow-sm rounded-4 border-0">
               {% if event.image %}
-                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top" alt="{{ event.name }}">
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}" class="card-img-top rounded-top-4" alt="{{ event.name }}" style="object-fit: cover; max-height: 250px;">
               {% else %}
-                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top" alt="Default Event">
+                <img src="{{ url_for('static', filename='img/default_event.jpg') }}" class="card-img-top rounded-top-4" alt="Default Event" style="object-fit: cover; max-height: 250px;">
               {% endif %}
 
-              <div class="card-body">
-                <h5 class="card-title">{{ event.name }}</h5>
+              <div class="card-body p-4">
+                <h5 class="card-title mb-3">{{ event.name }}</h5>
 
                 {% set status = event.status.lower() %}
                 {% if status == 'open' %}
-                  <span class="badge text-bg-success mb-2 p-2">Open</span>
+                  <span class="badge bg-success mb-3 px-3 py-2">Open</span>
                 {% elif status == 'sold out' %}
-                  <span class="badge text-bg-danger mb-2 p-2">Sold Out</span>
+                  <span class="badge bg-danger mb-3 px-3 py-2">Sold Out</span>
                 {% elif status == 'cancelled' %}
-                  <span class="badge text-bg-warning mb-2 p-2">Cancelled</span>
+                  <span class="badge bg-warning text-dark mb-3 px-3 py-2">Cancelled</span>
                 {% elif status == 'inactive' %}
-                  <span class="badge text-bg-secondary mb-2 p-2">Inactive</span>
+                  <span class="badge bg-secondary mb-3 px-3 py-2">Inactive</span>
                 {% else %}
-                  <span class="badge text-bg-secondary mb-2 p-2">{{ event.status }}</span>
+                  <span class="badge bg-secondary mb-3 px-3 py-2">{{ event.status }}</span>
                 {% endif %}
 
-                <p class="card-text mb-1"><strong>Location:</strong> {{ event.location }}</p>
-                <p class="card-text mb-1"><strong>Date:</strong> {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}</p>
-                <p class="card-text mb-2">
+                <p class="card-text mb-2 location-text"><strong>Location:</strong> {{ event.location }}</p>
+                <p class="card-text mb-2"><strong>Date:</strong>
+                  {% if event.event_date %}{{ event.event_date.strftime('%d %B %Y') }}{% endif %}
+                </p>
+                <p class="card-text mb-3">
                   <strong>Time:</strong>
                   {% if event.start_time %}{{ event.start_time.strftime('%I:%M %p')|lower }}{% endif %} –
                   {% if event.end_time %}{{ event.end_time.strftime('%I:%M %p')|lower }}{% endif %}
                 </p>
 
-                <!-- Short description preview -->
-                <p class="card-text mt-3" style="min-height: 90px;">
+                <p class="card-text mt-3 description-box" style="min-height: 90px;">
                   <strong>Description:</strong><br>
                   {% set desc = event.overview or event.description %}
                   {% if desc %}
@@ -233,11 +225,10 @@
                   {% endif %}
                 </p>
 
-                <hr class="my-2">
+                <hr class="my-3">
                 <p class="card-text text-muted mb-1"><strong>Artist:</strong> {{ event.artist or 'Unknown' }}</p>
-                <p class="text-muted mb-1" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
+                <p class="text-muted mb-2" style="font-size: 0.9rem;"><strong>Genre:</strong> {{ event.genres or 'Not specified' }}</p>
 
-                <!-- Ticket info -->
                 {% set current_status = event.status.lower() %}
                 {% if current_status == 'open' %}
                   <p class="card-text mb-1"><strong>Tickets:</strong> Tickets available
@@ -261,7 +252,7 @@
     </div>
   </div>
 
-  <!-- Keeps scroll position when filters/search are used -->
+  <!-- Scroll memory -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       if (sessionStorage.getItem("shouldScroll") === "true") {
@@ -275,7 +266,6 @@
       }
     });
 
-    // When a filter form is submitted, remember to scroll back down
     document.addEventListener("submit", (e) => {
       const action = e.target.getAttribute("action") || "";
       if (action.includes("/index") || action === "/") {
