@@ -123,7 +123,8 @@ def process_booking(event_id):
         flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
         # flash(f"Successfully booked {total_quantity} tickets for {event.name}! Check your booking history.", 'success')
         
-        return redirect(url_for('events.edit', id=ticket.event_id)) 
+        return redirect(url_for('events.show', id=event_id))
+
 
     except Exception as e:
         db.session.rollback()
@@ -208,128 +209,91 @@ def show(id):
 def create():
     """Create a new event"""
     form = EventForm()
-    
-    # For GET requests, ensure form is clean (no validation errors)
-    if request.method == 'GET':
-        form = EventForm()  # Create a fresh form instance
-        # Clear any potential errors from previous submissions
-        form.errors.clear()
-    
-    # Debug: Check database connection and table structure
-    try:
-        from .models import Event
-        event_count = Event.query.count()
-        print(f"Database connection OK. Current event count: {event_count}")
-    except Exception as db_error:
-        print(f"Database connection error: {db_error}")
-    
-    # post request 
-    print(f"Form submitted. Method: {request.method}")
-    print(f"Form validation result: {form.validate()}")
-    print(f"Form errors: {form.errors}")
-    print(f"Current user: {current_user.id if current_user.is_authenticated else 'Not authenticated'}")
-    
-    if form.validate_on_submit():
-        print(f"Form validation passed for user: {current_user.id} ({current_user.first_name})")
-        try:
-            # Handle file upload
-            image_filename = None
-            if form.image.data:
-                image = form.image.data
-                filename = secure_filename(image.filename)
-                
-                # If secure_filename removes everything, use a fallback
-                if not filename or len(filename) == 0:
-                    # Get file extension
-                    original_name = image.filename
-                    if '.' in original_name:
-                        ext = original_name.split('.')[-1].lower()
+
+    # Only run validation logic when the form is submitted
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            try:
+                image_filename = None
+
+                # Handle image upload if user added one
+                if form.image.data:
+                    image = form.image.data
+                    filename = secure_filename(image.filename)
+
+                    # If filename comes back empty, make a backup one
+                    if not filename:
+                        original_name = image.filename
+                        ext = original_name.split('.')[-1].lower() if '.' in original_name else 'jpg'
                         filename = f"event_image_{int(time.time())}.{ext}"
-                    else:
-                        filename = f"event_image_{int(time.time())}.jpg"
-                
-                if filename:
-                    # Create uploads directory if it doesn't exist
-                    # current_app.root_path points to the travel directory, so we need to go up one level
+
+                    # Save the image to the uploads folder
                     project_root = os.path.dirname(current_app.root_path)
                     upload_dir = os.path.join(project_root, 'static', 'uploads')
                     os.makedirs(upload_dir, exist_ok=True)
+                    image.save(os.path.join(upload_dir, filename))
                     image_filename = filename
-                    full_path = os.path.join(upload_dir, filename)
-                    image.save(full_path)
-                    print(f"Image saved to: {full_path}")
-            
-            # Create event
-            event = Event(
-                name=form.name.data,
-                artist=form.artist.data,
-                overview=form.overview.data,
-                location=form.location.data,
-                description=form.description.data,
-                genres=','.join(form.genres.data) if form.genres.data else '',
-                image=image_filename,
-                event_date=form.event_date.data,
-                start_time=form.start_time.data,
-                end_time=form.end_time.data,
-                status='Open',  # Always start as Open, status will be managed automatically
-                user_id=current_user.id  # Assign the current user as the event creator
-            )
-            
-            print(f"About to add event to database: {event.name} by {event.artist}")
-            db.session.add(event)
-            db.session.flush()  # Get the event ID
-            print(f"Created event with ID: {event.id}, User ID: {event.user_id}")
-            print(f"Event data: name={event.name}, artist={event.artist}, location={event.location}")
-            
-            # Handle ticket data
-            ticket_names = request.form.getlist('ticket_names')
-            ticket_prices = request.form.getlist('ticket_prices')
-            ticket_availabilities = request.form.getlist('ticket_availabilities')
-            ticket_descriptions = request.form.getlist('ticket_descriptions')
-            
-            # Create tickets if any were added
-            if ticket_names and ticket_prices and ticket_availabilities and ticket_descriptions:
+
+                # Create the new event and link it to the logged-in user
+                event = Event(
+                    name=form.name.data,
+                    artist=form.artist.data,
+                    overview=form.overview.data,
+                    location=form.location.data,
+                    description=form.description.data,
+                    genres=','.join(form.genres.data) if form.genres.data else '',
+                    image=image_filename,
+                    event_date=form.event_date.data,
+                    start_time=form.start_time.data,
+                    end_time=form.end_time.data,
+                    status='Open',
+                    user_id=current_user.id
+                )
+
+                # Add the event to the database but don’t commit yet
+                db.session.add(event)
+                db.session.flush()  # just to grab the new event ID
+
+                # Grab any tickets that were added on the page
+                ticket_names = request.form.getlist('ticket_names')
+                ticket_prices = request.form.getlist('ticket_prices')
+                ticket_availabilities = request.form.getlist('ticket_availabilities')
+                ticket_descriptions = request.form.getlist('ticket_descriptions')
+
+                # Loop through and create each ticket
                 for i in range(len(ticket_names)):
-                    if ticket_names[i] and ticket_prices[i] and ticket_availabilities[i] and ticket_descriptions[i]:
-                        availability = int(ticket_availabilities[i])
-                        
+                    if ticket_names[i]:
                         ticket = Ticket(
                             name=ticket_names[i],
                             price=float(ticket_prices[i]),
-                            availability=availability,
+                            availability=int(ticket_availabilities[i]),
                             description=ticket_descriptions[i],
                             event_id=event.id,
-                            status='Sold Out' if availability <= 0 else 'Available'
+                            status='Available'
                         )
                         db.session.add(ticket)
-            
-            # Update event status based on all tickets
-            update_event_status_based_on_tickets(event)
-            print(f"Updated new event {event.id} status to: {event.status}")
-            
-            db.session.commit()
-            print(f"Event {event.id} successfully committed to database")
-            
-            flash('Event created successfully!', 'success')
-            print(f"Redirecting to event details page for event {event.id}")
-            return redirect(url_for('events.show', id=event.id))
-            
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error creating event: {str(e)}")
-            flash(f'Error creating event: {str(e)}', 'error')
-    else:
-        # Show specific validation errors to the user
-        error_messages = format_form_errors(form)
-        
-        if error_messages:
-            flash('; '.join(error_messages), 'danger')
+
+                # Update event status based on ticket availability
+                update_event_status_based_on_tickets(event)
+
+                # Commit everything to the database
+                db.session.commit()
+
+                flash('Event created successfully!', 'success')
+                return redirect(url_for('events.show', id=event.id))
+
+            except Exception as e:
+                # Rollback if anything fails mid-process
+                db.session.rollback()
+                flash(f'Error creating event: {str(e)}', 'danger')
+
         else:
-            flash('Form validation failed. Please check the fields.', 'danger')
-        
-        print(f"Form validation failed. Errors: {form.errors}")
-    
-    # get request 
+            # If validation fails, show all the errors at once
+            error_messages = format_form_errors(form)
+            if error_messages:
+                flash('; '.join(error_messages), 'danger')
+
+    # Just render a clean empty form on GET
     return render_template('event_creation.html', form=form)
 
 

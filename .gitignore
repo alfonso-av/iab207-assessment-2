@@ -6,11 +6,11 @@ pycache/
 
 __pycache__/
 *.pyc
-instance/*.db
+# instance/*.db
 
 
 travel/__pycache__/
-instance/*
+
 # C extensions
 *.so
 
@@ -70,7 +70,6 @@ db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
-instance/
 .webassets-cache
 
 # Scrapy stuff:

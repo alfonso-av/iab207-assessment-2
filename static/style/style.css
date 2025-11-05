@@ -268,6 +268,48 @@ pre {
 
 #error {
   font-family: "bitcount grid single";
+}
 
+/* Make all cards stretch to equal height */
+#card_image .col-lg-4 {
+  display: flex;
+}
 
+#card_image .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Let the card body fill and distribute space evenly */
+#card_image .card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Clamp description text height for uniform card height */
+.description-box {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;     
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 4.5em;         /* keeps cards same size when description short */
+}
+
+/* prevent overly long addresses from wrapping too wildly */
+.location-text {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* add space between rows of cards */
+#card_image > .col-lg-4 {
+  margin-bottom: 2rem;  /* Adds clean spacing between card rows */
+}
+
+@media (max-width: 768px) {
+  #card_image > .col-lg-4 {
+    margin-bottom: 1.5rem;
+  }
 }
