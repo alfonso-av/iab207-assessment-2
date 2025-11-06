@@ -149,7 +149,7 @@ pre {
 /* ALFONSO */
 /* --- make event cards match homepage card height --- */
 #card_image .card-img-top {
-  height: 220px;      /* adjust this to 210–230px to match your homepage exactly */
+  height: 220px;      /* adjust to match homepage exactly */
   object-fit: cover;  /* crops oversized images instead of stretching */
   width: 100%;
 }
@@ -171,7 +171,7 @@ pre {
   position: relative;
 }
 
-/* 🪄 When hovered: card lifts, glows, and image brightens */
+/* 🪄 image hover and lift effect */
 .card:hover {
   transform: translateY(-10px) scale(1.02);
   box-shadow: 0 12px 25px rgba(0, 140, 255, 0.3);
@@ -190,6 +190,7 @@ pre {
   );
   opacity: 0;
   transition: opacity 0.4s ease;
+   pointer-events: none;
 }
 
 .card:hover::before {
