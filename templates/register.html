@@ -24,6 +24,19 @@
         {% endif %}
         {% endwith %}
 
+        {% for error in form.email.errors %}
+            <div class="alert alert-danger mt-3">
+                Please enter a correct email
+            </div>
+        {% endfor %}
+
+        {% for error in form.confirm.errors %}
+            <div class="alert alert-danger mt-3">
+                Please re-enter the same password
+            </div>
+        {% endfor %}
+
+
         <div class="m-5">
             <h1 id="title">Register Now</h1>
         </div>
@@ -70,14 +83,11 @@
                 class="form-control",
                 id="floatingPassword",
                 placeholder="",
-                pattern="^(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$",
-                title="At least 6 characters, one number, and one special character"
             ) }}
             <label for="floatingPassword">password</label>
             <div class="invalid-feedback">
-                Password must be at least 6 characters and include one number and one special character.
+                Please enter a password with a minimum of 4 characters
             </div>
-            <small class="text-muted">At least 6 characters, one number, and one special character.</small>
         </div>
 
         <h5>Confirm Password</h5>

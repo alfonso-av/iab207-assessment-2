@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields import TextAreaField, SubmitField, StringField, DateField, TimeField, FloatField, IntegerField, SelectMultipleField, SelectField, PasswordField
-from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError
+from wtforms.validators import InputRequired, Length, NumberRange, DataRequired, ValidationError, email, EqualTo, Regexp
 from wtforms.widgets import CheckboxInput, ListWidget
 
 class MultiCheckboxField(SelectMultipleField):
@@ -82,11 +82,11 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     first_name = StringField('First Name', validators=[InputRequired()])
     surname = StringField('Surname', validators=[InputRequired()])
-    email = StringField('Email ID', validators=[InputRequired() ])
+    email = StringField('Email ID', validators=[InputRequired(), email()])
     phone = StringField('Contact Number', validators=[InputRequired()])
     address = StringField('Street Address', validators=[InputRequired()])
-    password = StringField('Password', validators=[InputRequired(), Length(min=4, max=50),])
-    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=50)])
+    password = StringField('Password', validators=[InputRequired(), Length(min=4, max=50)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=50), EqualTo('password')])
     submit = SubmitField('Register now')
 
 
