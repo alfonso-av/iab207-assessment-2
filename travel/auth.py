@@ -4,6 +4,8 @@ from .models import User
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user
+import re
+
 
 from . import db
 
@@ -41,6 +43,11 @@ def register():
       if pwd != confirm:
         flash('Re-entered password is not the same. Please put in the same password', 'danger')
         return redirect(url_for('auth.register', pwd=confirm))
+      
+      # enforce strong password policy
+      if len(pwd) < 6 or not re.search(r'\d', pwd) or not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd):
+          flash('Password must be at least 6 characters long and include at least one number and one special character.', 'danger')
+          return redirect(url_for('auth.register'))
       
       password_hash = generate_password_hash(pwd)
       
