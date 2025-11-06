@@ -39,15 +39,7 @@ def register():
           if existing_user.emailid == email:
               flash('Email already registered. Please use a different email.', 'danger')
           return redirect(url_for('auth.register', emailid=email))
-
-      if pwd != confirm:
-        flash('Re-entered password is not the same. Please put in the same password', 'danger')
-        return redirect(url_for('auth.register', pwd=confirm))
       
-      # enforce strong password policy
-      if len(pwd) < 6 or not re.search(r'\d', pwd) or not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd):
-          flash('Password must be at least 6 characters long and include at least one number and one special character.', 'danger')
-          return redirect(url_for('auth.register'))
       
       password_hash = generate_password_hash(pwd)
       
